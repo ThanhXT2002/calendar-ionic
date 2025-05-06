@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'calandar',
+  appId: 'io.ionic.calendar',
+  appName: 'Lịch-TXT',
   webDir: 'www'
 };
 

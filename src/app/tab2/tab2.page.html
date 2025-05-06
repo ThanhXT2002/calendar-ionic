@@ -1,7 +1,7 @@
 
 
 <ion-content [fullscreen]="true" class="custom-content">
-<div class="p-4 mt-16">
+<div class="p-4 mt-32">
   <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-3">
         <!-- Điều hướng tháng -->
     <div class="flex justify-between items-center mb-4">
@@ -38,7 +38,7 @@
                      'bg-green-100': day.isToday && !day.isSelected,
                      'text-gray-400': !day.isCurrentMonth,
                      'rounded-full': day.isSelected || day.isToday}"
-          class="aspect-square p-1 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-100 transition rounded-md"
+          class="aspect-square p-1 flex flex-col items-center justify-center text-center cursor-pointer  transition rounded-md"
         >
           <div [ngClass]="{'font-bold': day.isCurrentMonth}">{{ day.solarDay }}</div>
           <div class="text-xs" [ngClass]="{'text-gray-300': !day.isCurrentMonth, 'text-gray-900': day.isCurrentMonth}">
