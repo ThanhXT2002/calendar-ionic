@@ -1,8 +1,8 @@
 
 
 <ion-content [fullscreen]="true" class="custom-content">
-  <div class="py-16"></div>
-  <div class="p-4 flex flex-col items-center ">
+  <div 
+  [ngClass]="getContainerClass()">
     <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6 mb-4">
       <div class="text-center mb-4">
         <h2 class="text-3xl font-bold text-gray-700">Hôm nay</h2>
@@ -41,13 +41,12 @@
     </div>
 
     <!-- Các sự kiện sắp tới -->
-<div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
-  <h3 class="text-xl font-semibold mb-4 text-gray-700">Các sự kiện sắp tới</h3>
-  <ul class="space-y-2">
+<div class="w-full max-w-md bg-white rounded-lg shadow-lg px-6 py-3">
+  <h3 class="text-xl font-semibold mb-3 text-gray-700">Các sự kiện sắp tới</h3>
+  <ul class="space-y-1">
     <li *ngFor="let event of upcomingEvents; trackBy: trackByFn"
         class="flex items-center p-2"
-        [class.border-b]="upcomingEvents[upcomingEvents.length - 1] !== event"
-        [class.border-gray-200]="upcomingEvents[upcomingEvents.length - 1] !== event">
+        >
       <div [class]="'w-14 h-14 flex items-center justify-center rounded-full mr-4 ' + event.bgColor + ' ' + event.textColor">
         <ion-icon [name]="event.iconName" class="text-3xl"></ion-icon>
       </div>

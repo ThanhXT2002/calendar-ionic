@@ -7,6 +7,7 @@ import { CalendarService } from '../core/services/calendar.service';
 import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { caretBack, caretForward } from 'ionicons/icons';
+import { isPlatform } from '@ionic/core';
 
 @Component({
   selector: 'app-tab2',
@@ -90,4 +91,20 @@ export class Tab2Page implements OnInit, OnDestroy {
   getLunarYearName(year: number): string {
     return this.calendarService.getLunarYearName(year);
   }
+
+  getContainerClass(): string {
+      const userAgent =
+        navigator.userAgent || navigator.vendor || (window as any).opera;
+
+      // Kiểm tra xem có phải đang chạy trên mobile thực sự
+      const isRealMobile = /android|iphone|ipad|ipod/i.test(userAgent);
+
+      if (isRealMobile && isPlatform('capacitor')) {
+        // Thực sự là mobile app
+        return 'p-4 mt-20';
+      } else {
+        // Web hoặc mobile browser
+        return 'p-4 mt-14';
+      }
+    }
 }
