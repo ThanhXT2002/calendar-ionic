@@ -1,17 +1,69 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Tab 1
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+<ion-content [fullscreen]="true" class="custom-content">
+  <div class="p-4 flex flex-col items-center mt-14">
+    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6 mb-4">
+      <div class="text-center mb-4">
+        <h2 class="text-3xl font-bold text-gray-700">Hôm nay</h2>
+         <p class="text-gray-500 text-xl mt-2 font-medium">{{ today | date: 'EEEE, dd/MM/yyyy':'':'vi' }}</p>
+      </div>
+
+      <!-- Lịch dương -->
+      <div class="mb-4 p-4 bg-blue-300 rounded-lg">
+        <h3 class="text-2xl font-semibold text-blue-700 mb-2">Dương lịch</h3>
+        <div class="flex justify-between text-xl">
+          <div>
+            <p class="text-4xl font-bold">{{ today | date: 'dd' }}</p>
+            <p>Tháng {{ today | date: 'MM' }}</p>
+            <p>Năm {{ today | date: 'yyyy' }}</p>
+          </div>
+          <div class="flex items-center">
+            <ion-icon name="calendar-outline" class="text-7xl text-blue-500"></ion-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lịch âm -->
+      <div class="p-4 bg-red-300 rounded-lg">
+        <h3 class="text-2xl font-semibold text-red-700 mb-2">Âm lịch</h3>
+        <div class="flex justify-between text-xl">
+          <div>
+            <p class="text-4xl font-bold">{{ lunarDate.day }}</p>
+            <p>{{ getLunarMonthName(lunarDate.month) }}</p>
+            <p>Năm {{ getLunarYearName(lunarDate.year) }} ({{ lunarDate.year }})</p>
+          </div>
+          <div class="flex items-center">
+            <ion-icon name="moon-outline" class="text-7xl text-red-500"></ion-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Các sự kiện sắp tới -->
+<div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+  <h3 class="text-xl font-semibold mb-4 text-gray-700">Các sự kiện sắp tới</h3>
+  <ul class="space-y-2">
+    <li *ngFor="let event of upcomingEvents; trackBy: trackByFn"
+        class="flex items-center p-2"
+        [class.border-b]="upcomingEvents[upcomingEvents.length - 1] !== event"
+        [class.border-gray-200]="upcomingEvents[upcomingEvents.length - 1] !== event">
+      <div [class]="'w-14 h-14 flex items-center justify-center rounded-full mr-4 ' + event.bgColor + ' ' + event.textColor">
+        <ion-icon [name]="event.iconName" class="text-3xl"></ion-icon>
+      </div>
+      <div class="flex-1">
+        <p class="font-medium text-gray-600">{{event.name}}</p>
+        <div class="flex items-center text-sm text-gray-500">
+          <span>Còn {{event.daysUntil}} ngày</span>
+          <span [class]="'ml-2 px-2 py-0.5 rounded text-xs ' + (event.isLunar ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800')">
+            {{event.isLunar ? 'Âm lịch' : 'Dương lịch'}}
+          </span>
+        </div>
+      </div>
+    </li>
+    <li *ngIf="upcomingEvents.length === 0" class="text-center text-gray-500 py-4">
+      Không có sự kiện sắp tới
+    </li>
+  </ul>
+</div>
+  </div>
 </ion-content>

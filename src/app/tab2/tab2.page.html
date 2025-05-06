@@ -1,17 +1,71 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Tab 2
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+<ion-content [fullscreen]="true" class="custom-content">
+<div class="p-4 mt-16">
+  <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-3">
+        <!-- Điều hướng tháng -->
+    <div class="flex justify-between items-center mb-4">
+      <ion-button fill="clear" (click)="previousMonth()">
+        <ion-icon slot="icon-only" name="caret-back" class="text-black"></ion-icon>
+      </ion-button>
+
+      <div class="text-center">
+        <h2 class="text-xl font-bold">{{ currentMonthName }} - {{ currentYear }}</h2>
+      </div>
+
+      <ion-button fill="clear" (click)="nextMonth()">
+        <ion-icon slot="icon-only" name="caret-forward" class="text-black"></ion-icon>
+      </ion-button>
+    </div>
+
+    <!-- Ngày trong tuần -->
+    <div class="grid grid-cols-7 text-center mb-2">
+      <div class="font-semibold text-red-500">CN</div>
+      <div class="font-semibold">T2</div>
+      <div class="font-semibold">T3</div>
+      <div class="font-semibold">T4</div>
+      <div class="font-semibold">T5</div>
+      <div class="font-semibold">T6</div>
+      <div class="font-semibold">T7</div>
+    </div>
+
+    <!-- Lịch -->
+    <div class="grid grid-cols-7 gap-1">
+      <ng-container *ngFor="let day of days">
+        <div
+          (click)="selectDate(day)"
+          [ngClass]="{'bg-green-500 text-white': day.isSelected,
+                     'bg-green-100': day.isToday && !day.isSelected,
+                     'text-gray-400': !day.isCurrentMonth,
+                     'rounded-full': day.isSelected || day.isToday}"
+          class="aspect-square p-1 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-100 transition rounded-md"
+        >
+          <div [ngClass]="{'font-bold': day.isCurrentMonth}">{{ day.solarDay }}</div>
+          <div class="text-xs" [ngClass]="{'text-gray-300': !day.isCurrentMonth, 'text-gray-900': day.isCurrentMonth}">
+            {{ day.lunarDay }}
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+
+    <!-- Thông tin ngày được chọn -->
+    <div class="mt-6 p-4 bg-white rounded-lg shadow-md" *ngIf="selectedDay">
+      <h3 class="text-lg font-bold mb-2">{{ selectedDay.date | date: 'EEEE, dd/MM/yyyy' }}</h3>
+
+      <div class="flex justify-around mb-4">
+        <div>
+          <p class="font-medium text-blue-500">Dương lịch:</p>
+          <p>Ngày {{ selectedDay.solarDay }}/{{ selectedDay.solarMonth }}/{{ selectedDay.solarYear }}</p>
+        </div>
+        <div>
+          <p class="font-medium text-red-500">Âm lịch:</p>
+          <p>Ngày {{ selectedDay.lunarDay }}/{{ selectedDay.lunarMonth }}/{{ selectedDay.lunarYear }}</p>
+          <p class="text-sm">{{ getLunarMonthName(selectedDay.lunarMonth) }}</p>
+          <p class="text-sm">{{ getLunarYearName(selectedDay.lunarYear) }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </ion-content>
