@@ -13,7 +13,7 @@ import { HeaderComponent } from "../components/header/header.component";
 export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);
 
-  title = 'Lịch - Tổng quan';
+  title = 'Lịch - Hôm Nay';
 
   constructor() {
     addIcons({ albums, calendar, sunny, settings, star });

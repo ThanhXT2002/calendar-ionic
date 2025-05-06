@@ -228,20 +228,4 @@ export class Tab1Page implements OnInit {
   trackByFn(index: number, item: IUpcomingEvent): string {
     return item.name;
   }
-
-  getContainerClass(): string {
-    const userAgent =
-      navigator.userAgent || navigator.vendor || (window as any).opera;
-
-    // Kiểm tra xem có phải đang chạy trên mobile thực sự
-    const isRealMobile = /android|iphone|ipad|ipod/i.test(userAgent);
-
-    if (isRealMobile && isPlatform('capacitor')) {
-      // Thực sự là mobile app
-      return 'p-4 flex flex-col items-center mt-20';
-    } else {
-      // Web hoặc mobile browser
-      return 'p-4 flex flex-col items-center mt-14';
-    }
-  }
 }
