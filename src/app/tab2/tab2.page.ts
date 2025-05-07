@@ -5,15 +5,13 @@ import { ICalendarDay } from '../core/interfaces/calendar-day.interface';
 import { Subscription } from 'rxjs';
 import { CalendarService } from '../core/services/calendar.service';
 import { CommonModule } from '@angular/common';
-import { addIcons } from 'ionicons';
-import { caretBack, caretForward } from 'ionicons/icons';
 import { isPlatform } from '@ionic/core';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
-  imports: [IonIcon, IonButton, IonContent, CommonModule],
+  imports: [IonButton, IonContent, CommonModule],
 })
 export class Tab2Page implements OnInit, OnDestroy {
   days: ICalendarDay[] = [];
@@ -28,8 +26,6 @@ export class Tab2Page implements OnInit, OnDestroy {
   constructor(private calendarService: CalendarService) {}
 
   ngOnInit() {
-    addIcons({ caretBack, caretForward });
-
     // Đăng ký lắng nghe sự thay đổi ngày hiện tại
     this.subscriptions.add(
       this.calendarService.currentDate$.subscribe((date) => {
@@ -92,19 +88,20 @@ export class Tab2Page implements OnInit, OnDestroy {
     return this.calendarService.getLunarYearName(year);
   }
 
-  getContainerClass(): string {
-      const userAgent =
-        navigator.userAgent || navigator.vendor || (window as any).opera;
+  getMarginTopClass(): string {
+    const userAgent = navigator.userAgent.toLowerCase();
 
-      // Kiểm tra xem có phải đang chạy trên mobile thực sự
-      const isRealMobile = /android|iphone|ipad|ipod/i.test(userAgent);
-
-      if (isRealMobile && isPlatform('capacitor')) {
-        // Thực sự là mobile app
-        return 'p-4 mt-20';
-      } else {
-        // Web hoặc mobile browser
-        return 'p-4 mt-14';
-      }
+    // Nếu là Android trình duyệt (không phải app Ionic/Capacitor)
+    if (
+      userAgent.includes('android') &&
+      !userAgent.includes('wv') &&
+      !userAgent.includes('cordova') &&
+      !userAgent.includes('capacitor')
+    ) {
+      return 'mt-14';
     }
+
+    // Mặc định: app (Ionic app build native hoặc webview)
+    return 'mt-9';
+  }
 }

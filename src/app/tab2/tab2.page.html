@@ -1,12 +1,14 @@
 
 
 <ion-content [fullscreen]="true" class="custom-content">
-<div class="p-4 mt-14">
-  <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-3">
+<div class="p-4"
+[ngClass]="getMarginTopClass()"
+>
+  <div class="w-full  bg-white rounded-lg shadow-lg p-3">
         <!-- Điều hướng tháng -->
     <div class="flex justify-between items-center mb-4">
       <ion-button fill="clear" (click)="previousMonth()">
-        <ion-icon slot="icon-only" name="caret-back" class="text-black"></ion-icon>
+        <i class="fa-solid fa-caret-left text-xl text-black"></i>
       </ion-button>
 
       <div class="text-center">
@@ -14,7 +16,8 @@
       </div>
 
       <ion-button fill="clear" (click)="nextMonth()">
-        <ion-icon slot="icon-only" name="caret-forward" class="text-black"></ion-icon>
+        <i class="fa-solid fa-caret-right text-xl text-black"></i>
+        <!-- <ion-icon slot="icon-only" name="caret-forward" class="text-black"></ion-icon> -->
       </ion-button>
     </div>
 

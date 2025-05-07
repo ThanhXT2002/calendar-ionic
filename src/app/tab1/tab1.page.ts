@@ -74,7 +74,7 @@ export class Tab1Page implements OnInit {
             daysUntil,
             isLunar: festival.isLunar,
             type: 'festival',
-            iconName: 'gift-outline',
+            iconName: 'fa-solid fa-fire-flame-curved',
             bgColor: 'bg-green-300',
             textColor: 'text-green-600',
           };
@@ -102,7 +102,7 @@ export class Tab1Page implements OnInit {
             daysUntil,
             isLunar: memorial.isLunar,
             type: 'memorial',
-            iconName: 'star-outline',
+            iconName: 'fa-regular fa-star',
             bgColor: 'bg-purple-300',
             textColor: 'text-purple-600',
           };
@@ -227,5 +227,22 @@ export class Tab1Page implements OnInit {
 
   trackByFn(index: number, item: IUpcomingEvent): string {
     return item.name;
+  }
+
+  getMarginTopClass(): string {
+    const userAgent = navigator.userAgent.toLowerCase();
+
+    // Nếu là Android trình duyệt (không phải app Ionic/Capacitor)
+    if (
+      userAgent.includes('android') &&
+      !userAgent.includes('wv') &&
+      !userAgent.includes('cordova') &&
+      !userAgent.includes('capacitor')
+    ) {
+      return 'mt-14';
+    }
+
+    // Mặc định: app (Ionic app build native hoặc webview)
+    return 'mt-9';
   }
 }
