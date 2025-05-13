@@ -9,6 +9,7 @@
     "build": "ng build",
     "android:setup": "ionic capacitor add android && ionic capacitor copy android && ionic capacitor open android",
     "web:preview": "ionic build --prod && http-server www/ -o",
+    "build:vercel": "node generate-env.js && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"
