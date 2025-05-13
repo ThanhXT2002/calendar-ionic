@@ -38,6 +38,10 @@ export class Tab1Page implements OnInit {
   };
 
   upcomingEvents: IUpcomingEvent[] = [];
+  loadingSolar: boolean = false;
+  loadingLunar: boolean = false;
+  isSpeakingSolar = false;
+  isSpeakingLunar = false;
 
   constructor(
     private calendarService: CalendarService,
@@ -242,25 +246,66 @@ export class Tab1Page implements OnInit {
     const formattedDate = `Lịch dương hôm nay là ${dayOfWeek}, ngày ${dayOfMonth} tháng ${month} năm ${year}`;
     console.log('Formatted Date:', formattedDate);
     // console.log('Formatted Date:', dayOfWeek);
-    this.tts.speak(formattedDate).subscribe((res) => {
-      const audioContent = res.audioContent;
-      const audio = new Audio('data:audio/mp3;base64,' + audioContent);
-      audio.play();
+    this.loadingSolar = true;
+    this.isSpeakingSolar = true;
+
+    this.tts.speak(formattedDate).subscribe({
+      next: (res) => {
+        this.loadingSolar = false;
+
+        const audioContent = res.audioContent;
+        if (audioContent) {
+          const audio = new Audio('data:audio/mp3;base64,' + audioContent);
+          audio.play();
+
+          audio.onended = () => {
+            this.isSpeakingSolar = false;
+          };
+        } else {
+          console.error('Không có dữ liệu âm thanh trả về');
+          this.isSpeakingSolar = false;
+        }
+      },
+      error: (err) => {
+        this.loadingSolar = false;
+        this.isSpeakingSolar = false;
+        console.error('Lỗi khi gọi Google TTS:', err);
+      },
     });
   }
 
   speakTodayDateLunar() {
-
     const formattedDate = `Âm lịch hôm nay là ngày ${
       this.lunarDate.day
     } ${this.getLunarMonthName(
       this.lunarDate.month
     )} năm ${this.getLunarYearName(this.lunarDate.year)}`;
     console.log('Formatted Date:', formattedDate);
-    this.tts.speak(formattedDate).subscribe((res) => {
-      const audioContent = res.audioContent;
-      const audio = new Audio('data:audio/mp3;base64,' + audioContent);
-      audio.play();
+    this.loadingLunar = true;
+    this.isSpeakingLunar = true;
+
+    this.tts.speak(formattedDate).subscribe({
+      next: (res) => {
+        this.loadingLunar = false;
+
+        const audioContent = res.audioContent;
+        if (audioContent) {
+          const audio = new Audio('data:audio/mp3;base64,' + audioContent);
+          audio.play();
+
+          audio.onended = () => {
+            this.isSpeakingLunar = false;
+          };
+        } else {
+          console.error('Không có dữ liệu âm thanh trả về');
+          this.isSpeakingLunar = false;
+        }
+      },
+      error: (err) => {
+        this.loadingLunar = false;
+        this.isSpeakingLunar = false;
+        console.error('Lỗi khi gọi Google TTS:', err);
+      },
     });
   }
 
