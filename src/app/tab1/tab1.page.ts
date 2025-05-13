@@ -278,6 +278,6 @@ export class Tab1Page implements OnInit {
     }
 
     // Mặc định: app (Ionic app build native hoặc webview)
-    return 'mt-9';
+    return 'mt-10';
   }
 }

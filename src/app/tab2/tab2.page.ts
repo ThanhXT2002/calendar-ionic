@@ -102,6 +102,6 @@ export class Tab2Page implements OnInit, OnDestroy {
     }
 
     // Mặc định: app (Ionic app build native hoặc webview)
-    return 'mt-9';
+    return 'mt-10';
   }
 }
