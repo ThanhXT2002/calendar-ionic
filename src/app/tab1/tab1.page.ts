@@ -9,6 +9,7 @@ import { LunarCalendarService } from '../core/services/lunar-calendar.service';
 import { Festivals } from '../core/data/festivals.data';
 import { MemorialDays } from '../core/data/memorial-days.data';
 import { isPlatform } from '@ionic/angular/standalone';
+import { TextToSpeechService } from '../core/services/text-to-speech.service';
 
 
 export interface IUpcomingEvent {
@@ -26,7 +27,7 @@ export interface IUpcomingEvent {
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
-  imports: [IonIcon, CommonModule, DatePipe, IonContent],
+  imports: [CommonModule, DatePipe, IonContent],
 })
 export class Tab1Page implements OnInit {
   today: Date = new Date();
@@ -40,12 +41,14 @@ export class Tab1Page implements OnInit {
 
   constructor(
     private calendarService: CalendarService,
-    private lunarCalendarService: LunarCalendarService
-  ) {}
+    private lunarCalendarService: LunarCalendarService,
+    private tts: TextToSpeechService
+  ) {
+    this.lunarDate = this.calendarService.getLunarDateForSolar(this.today);
+  }
 
   ngOnInit() {
     addIcons({ giftOutline, starOutline, calendarOutline, moonOutline });
-    this.lunarDate = this.calendarService.getLunarDateForSolar(this.today);
     this.calculateUpcomingEvents();
   }
 
@@ -227,6 +230,38 @@ export class Tab1Page implements OnInit {
 
   trackByFn(index: number, item: IUpcomingEvent): string {
     return item.name;
+  }
+
+  speakTodayDateSolar() {
+    const datePipe = new DatePipe('vi-VN');
+    // const formattedDate = datePipe.transform(this.today, 'EEEE, dd/MM/yyyy');
+    const dayOfWeek = datePipe.transform(this.today, 'EEEE');
+    const dayOfMonth = datePipe.transform(this.today, 'dd');
+    const month = datePipe.transform(this.today, 'MM');
+    const year = datePipe.transform(this.today, 'yyyy');
+    const formattedDate = `Lịch dương hôm nay là ${dayOfWeek}, ngày ${dayOfMonth} tháng ${month} năm ${year}`;
+    console.log('Formatted Date:', formattedDate);
+    // console.log('Formatted Date:', dayOfWeek);
+    this.tts.speak(formattedDate).subscribe((res) => {
+      const audioContent = res.audioContent;
+      const audio = new Audio('data:audio/mp3;base64,' + audioContent);
+      audio.play();
+    });
+  }
+
+  speakTodayDateLunar() {
+
+    const formattedDate = `Âm lịch hôm nay là ngày ${
+      this.lunarDate.day
+    } ${this.getLunarMonthName(
+      this.lunarDate.month
+    )} năm ${this.getLunarYearName(this.lunarDate.year)}`;
+    console.log('Formatted Date:', formattedDate);
+    this.tts.speak(formattedDate).subscribe((res) => {
+      const audioContent = res.audioContent;
+      const audio = new Audio('data:audio/mp3;base64,' + audioContent);
+      audio.play();
+    });
   }
 
   getMarginTopClass(): string {

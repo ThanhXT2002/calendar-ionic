@@ -9,12 +9,14 @@ import { provideServiceWorker } from '@angular/service-worker';
 
 import { registerLocaleData } from '@angular/common';
 import localeVi from '@angular/common/locales/vi';
+import { provideHttpClient } from '@angular/common/http';
 registerLocaleData(localeVi);
 
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
+    provideHttpClient(), // Thêm dòng này
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
