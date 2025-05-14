@@ -1,8 +1,8 @@
 {
   "name": "Lịch-TXT",
   "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "author": "tranxuanthanhtxt2002@gmail.com",
+  "homepage": "https://tranxuanthanhtxt.com",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 4400 --host 0.0.0.0",
