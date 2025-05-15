@@ -23,6 +23,8 @@ export interface IUpcomingEvent {
   textColor: string;
 }
 
+type SpeakType = 'solar' | 'lunar';
+
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
@@ -32,9 +34,9 @@ export interface IUpcomingEvent {
 export class Tab1Page implements OnInit {
   today: Date = new Date();
   lunarDate: { day: number; month: number; year: number } = {
-    day: 1,
-    month: 1,
-    year: 2023,
+    day: 15,
+    month: 5,
+    year: 2025,
   };
 
   upcomingEvents: IUpcomingEvent[] = [];
@@ -236,77 +238,116 @@ export class Tab1Page implements OnInit {
     return item.name;
   }
 
-  speakTodayDateSolar() {
-    const datePipe = new DatePipe('vi-VN');
-    // const formattedDate = datePipe.transform(this.today, 'EEEE, dd/MM/yyyy');
-    const dayOfWeek = datePipe.transform(this.today, 'EEEE');
-    const dayOfMonth = datePipe.transform(this.today, 'dd');
-    const month = datePipe.transform(this.today, 'MM');
-    const year = datePipe.transform(this.today, 'yyyy');
-    const formattedDate = `Lịch dương hôm nay là ${dayOfWeek}, ngày ${dayOfMonth} tháng ${month} năm ${year}`;
-    console.log('Formatted Date:', formattedDate);
-    // console.log('Formatted Date:', dayOfWeek);
-    this.loadingSolar = true;
-    this.isSpeakingSolar = true;
+  // Hàm chung để phát âm thanh
+  private speakWithLocalStorage(text: string, type: SpeakType): void {
+    const today = new Date().toISOString().split('T')[0]; // Lấy ngày hôm nay dạng YYYY-MM-DD
+    const storageKey = `voice_${type}_${today}`;
 
-    this.tts.speak(formattedDate).subscribe({
+    // Kiểm tra cache trong localStorage
+    const cachedVoice = localStorage.getItem(storageKey);
+    const cachedDate = localStorage.getItem(`${storageKey}_date`);
+
+    // Nếu có cache và là của ngày hôm nay
+    if (cachedVoice && cachedDate === today) {
+      console.log(`Sử dụng voice ${type} từ cache`);
+
+      // Chỉ đặt trạng thái isSpeaking, không đặt loading
+      if (type === 'solar') {
+        this.isSpeakingSolar = true;
+      } else {
+        this.isSpeakingLunar = true;
+      }
+
+      this.playAudio(cachedVoice, type);
+      return;
+    }
+
+    // Nếu không có cache, đặt cả loading và isSpeaking là true
+    if (type === 'solar') {
+      this.loadingSolar = true;
+      this.isSpeakingSolar = true;
+    } else {
+      this.loadingLunar = true;
+      this.isSpeakingLunar = true;
+    }
+
+    // Gọi API
+    this.tts.speak(text).subscribe({
       next: (res) => {
-        this.loadingSolar = false;
+        if (type === 'solar') {
+          this.loadingSolar = false;
+        } else {
+          this.loadingLunar = false;
+        }
 
         const audioContent = res.audioContent;
         if (audioContent) {
-          const audio = new Audio('data:audio/mp3;base64,' + audioContent);
-          audio.play();
+          // Lưu vào localStorage
+          localStorage.setItem(storageKey, audioContent);
+          localStorage.setItem(`${storageKey}_date`, today);
 
-          audio.onended = () => {
-            this.isSpeakingSolar = false;
-          };
+          this.playAudio(audioContent, type);
         } else {
           console.error('Không có dữ liệu âm thanh trả về');
-          this.isSpeakingSolar = false;
+          if (type === 'solar') {
+            this.isSpeakingSolar = false;
+          } else {
+            this.isSpeakingLunar = false;
+          }
         }
       },
       error: (err) => {
-        this.loadingSolar = false;
-        this.isSpeakingSolar = false;
-        console.error('Lỗi khi gọi Google TTS:', err);
+        if (type === 'solar') {
+          this.loadingSolar = false;
+          this.isSpeakingSolar = false;
+        } else {
+          this.loadingLunar = false;
+          this.isSpeakingLunar = false;
+        }
+        console.error(`Lỗi khi gọi Google TTS cho ${type}:`, err);
       },
     });
   }
 
-  speakTodayDateLunar() {
+  // Hàm phụ để phát audio
+  private playAudio(audioContent: string, type: SpeakType): void {
+    const audio = new Audio('data:audio/mp3;base64,' + audioContent);
+    audio.play();
+
+    audio.onended = () => {
+      if (type === 'solar') {
+        this.isSpeakingSolar = false;
+      } else {
+        this.isSpeakingLunar = false;
+      }
+    };
+  }
+
+  // Hàm phát âm lịch dương
+  speakTodayDateSolar(): void {
+    const datePipe = new DatePipe('vi-VN');
+    const dayOfWeek = datePipe.transform(this.today, 'EEEE');
+    const dayOfMonth = datePipe.transform(this.today, 'dd');
+    const month = datePipe.transform(this.today, 'MM');
+    const year = datePipe.transform(this.today, 'yyyy');
+
+    const formattedDate = `Lịch dương hôm nay là ${dayOfWeek}, ngày ${dayOfMonth} tháng ${month} năm ${year}`;
+    console.log('Formatted Date Solar:', formattedDate);
+
+    this.speakWithLocalStorage(formattedDate, 'solar');
+  }
+
+  // Hàm phát âm lịch âm
+  speakTodayDateLunar(): void {
     const formattedDate = `Âm lịch hôm nay là ngày ${
       this.lunarDate.day
     } ${this.getLunarMonthName(
       this.lunarDate.month
     )} năm ${this.getLunarYearName(this.lunarDate.year)}`;
-    console.log('Formatted Date:', formattedDate);
-    this.loadingLunar = true;
-    this.isSpeakingLunar = true;
 
-    this.tts.speak(formattedDate).subscribe({
-      next: (res) => {
-        this.loadingLunar = false;
+    console.log('Formatted Date Lunar:', formattedDate);
 
-        const audioContent = res.audioContent;
-        if (audioContent) {
-          const audio = new Audio('data:audio/mp3;base64,' + audioContent);
-          audio.play();
-
-          audio.onended = () => {
-            this.isSpeakingLunar = false;
-          };
-        } else {
-          console.error('Không có dữ liệu âm thanh trả về');
-          this.isSpeakingLunar = false;
-        }
-      },
-      error: (err) => {
-        this.loadingLunar = false;
-        this.isSpeakingLunar = false;
-        console.error('Lỗi khi gọi Google TTS:', err);
-      },
-    });
+    this.speakWithLocalStorage(formattedDate, 'lunar');
   }
 
   getMarginTopClass(): string {

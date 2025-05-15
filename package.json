@@ -6,7 +6,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 4400 --host 0.0.0.0",
-    "build": "ng build",
+    "build": "ng build --configuration production",
     "android:setup": "ionic capacitor add android && ionic capacitor copy android && ionic capacitor open android",
     "web:preview": "ionic build --prod && http-server www/ -o",
     "build:vercel": "node generate-env.js && ng build --configuration production",
