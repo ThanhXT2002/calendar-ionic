@@ -1,0 +1,123 @@
+<!-- extended-day-info.component.html -->
+<div class="extended-day-info ">
+
+  <!-- Can Chi và thông tin cơ bản -->
+
+ <div class="p-2">
+  <div class=" bg-purple-200 rounded-lg  py-3 text-center">
+    <i class="fa-solid fa-yin-yang mr-2 text-2xl mb-2"></i>
+    <h2 class="text-lg">Ngày <strong>{{dayCanChi}} </strong> Tháng <strong>{{monthCanChi}}</strong> Năm <strong>{{yearCanChi}}</strong></h2>
+  </div>
+ </div>
+
+   <!-- Giờ hoàng đạo
+   <ion-card *ngIf="goodHours.length > 0">
+    <ion-card-header>
+      <ion-card-title class="text-lg">
+        <i class="fa-solid fa-clock mr-2"></i>
+        Giờ hoàng đạo ({{ goodHours.length }} giờ)
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list lines="none">
+        <ion-item *ngFor="let hour of goodHours" class="mb-2">
+          <div class="w-full">
+            <div class="flex justify-between items-start mb-1">
+              <h4 class="font-semibold text-blue-700">{{ hour.name }}</h4>
+              <span class="text-sm font-medium text-gray-600">
+                {{ hour.startTime }} - {{ hour.endTime }}
+              </span>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-2">{{ hour.description }}</p>
+
+            <div *ngIf="hour.suitableFor.length > 0" class="flex flex-wrap gap-1">
+              <ion-chip *ngFor="let activity of hour.suitableFor"
+                        color="primary"
+                        size="small">
+                {{ activity }}
+              </ion-chip>
+            </div>
+          </div>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card> -->
+
+
+  <!-- Chất lượng ngày -->
+<!-- Chất lượng ngày -->
+<ion-card *ngIf="dayQuality">
+  <ion-card-header>
+    <ion-card-title class="text-lg">
+      <i class="fa-solid fa-calendar-check mr-2"></i>
+      Chất lượng ngày
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+
+    <!-- Hoàng đạo / Hắc đạo -->
+    <div class="text-center mb-4">
+      <div class="flex items-center justify-center mb-2">
+        <ion-icon
+          [name]="getQualityIcon(dayQuality.quality)"
+          [color]="getQualityColor(dayQuality.quality)"
+          class="text-2xl mr-2">
+        </ion-icon>
+        <span class="text-xl font-bold"
+              [ngClass]="dayQuality.isGoodDay ? 'text-green-600' : 'text-red-600'">
+          {{ dayQuality.quality.toUpperCase() }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Nên làm -->
+<div *ngIf="dayQuality.suitableFor.length > 0" class="mb-3">
+  <h5 class="font-semibold text-green-700 mb-2">
+    <i class="fa-solid fa-check-circle mr-1"></i>
+    Nên làm:
+  </h5>
+  <div class="flex flex-wrap">
+    <span *ngFor="let item of dayQuality.suitableFor"
+          class="relative bg-green-600 text-white text-sm font-medium px-3 py-1 rounded-xl shadow mr-2 mb-2 before:content-[''] before:absolute before:top-1/2 before:left-0 before:-ml-2 before:-translate-y-1/2 before:border-[6px] before:border-solid before:border-r-green-600 before:border-t-transparent before:border-b-transparent before:border-l-transparent">
+      {{ item }}
+    </span>
+  </div>
+</div>
+
+<!-- Nên tránh -->
+<div *ngIf="dayQuality.avoidFor.length > 0" class="mb-3">
+  <h5 class="font-semibold text-red-700 mb-2">
+    <i class="fa-solid fa-times-circle mr-1"></i>
+    Nên tránh:
+  </h5>
+  <div class="flex flex-wrap">
+    <span *ngFor="let item of dayQuality.avoidFor"
+          class="relative bg-red-600 text-white text-sm font-medium px-3 py-1 rounded-xl shadow mr-2 mb-2 before:content-[''] before:absolute before:top-1/2 before:left-0 before:-ml-2 before:-translate-y-1/2 before:border-[6px] before:border-solid before:border-r-red-600 before:border-t-transparent before:border-b-transparent before:border-l-transparent">
+      {{ item }}
+    </span>
+  </div>
+</div>
+
+<!-- Tuổi xung khắc -->
+<div *ngIf="dayQuality.conflictAges.length > 0">
+  <h5 class="font-semibold text-orange-700 mb-2">
+    <i class="fa-solid fa-exclamation-triangle mr-1"></i>
+    Tuổi xung khắc:
+  </h5>
+  <div class="flex flex-wrap">
+    <span *ngFor="let age of dayQuality.conflictAges"
+          class="relative bg-orange-600 text-white text-sm font-medium px-3 py-1 rounded-xl shadow mr-2 mb-2 before:content-[''] before:absolute before:top-1/2 before:left-0 before:-ml-2 before:-translate-y-1/2 before:border-[6px] before:border-solid before:border-r-orange-600 before:border-t-transparent before:border-b-transparent before:border-l-transparent">
+      {{ age }}
+    </span>
+  </div>
+</div>
+
+
+  </ion-card-content>
+</ion-card>
+
+
+
+
+</div>

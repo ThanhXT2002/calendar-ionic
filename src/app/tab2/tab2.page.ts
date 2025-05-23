@@ -6,6 +6,7 @@ import { CalendarService } from '../core/services/calendar.service';
 import { CommonModule } from '@angular/common';
 import { isPlatform } from '@ionic/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ExtendedDayInfoComponent } from "../components/extended-day-info/extended-day-info.component";
 
 @Component({
   selector: 'app-tab2',
@@ -17,7 +18,8 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-  ],
+    ExtendedDayInfoComponent
+],
 })
 export class Tab2Page implements OnInit, OnDestroy {
   days: ICalendarDay[] = [];

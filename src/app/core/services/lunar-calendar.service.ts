@@ -87,33 +87,35 @@ export class LunarCalendarService {
    * Lấy tên Can Chi của năm âm lịch
    */
   getLunarYearName(year: number): string {
-    const can = ['Canh', 'Tân', 'Nhâm', 'Quý', 'Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ'];
-    const chi = ['Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tị', 'Ngọ', 'Mùi'];
-
-    return can[year % 10] + ' ' + chi[year % 12];
+    const stemBranch = this.calendar.getLunarYearStemBranch(year);
+    return stemBranch.say; // Ví dụ: "Giáp Thìn"
   }
 
+  getYearCanChi(date: Date): string {
+    const stemBranch = this.calendar.getLunarYearStemBranch(date.getFullYear());
+    return stemBranch.say; // Ví dụ: "Giáp Thìn"
+  }
+
+  /**
+   * Lấy Can Chi của tháng
+   */
+
+  getMonthCanChi(date: Date): string {
+    const lunarDate = this.calendar.getLunarDate(date);
+    const year = lunarDate.year;
+    const lunarMonth = lunarDate.month;
+
+    const stemBranch = this.calendar.getLunarMonthStemBranch(year, lunarMonth);
+    return stemBranch.say;
+  }
 
   /**
    * Lấy Can Chi của ngày
    */
   getDayCanChi(date: Date): string {
     const dayNumber = this.calendar.getDayNumber(date);
-    const canchi = this.calendar.getLunarDayStemBranch(dayNumber);
-
-    const stemNames = [
-      'Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu',
-      'Kỷ', 'Canh', 'Tân', 'Nhâm', 'Quý',
-    ];
-    const branchNames = [
-      'Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ',
-      'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi',
-    ];
-
-    const stem = stemNames[canchi.stemIndex];
-    const branch = branchNames[canchi.branchIndex];
-
-    return `${stem} ${branch}`;
+    const stemBranch = this.calendar.getLunarDayStemBranch(dayNumber);
+    return stemBranch.say;
   }
 
   // ==================== VALIDATION METHODS ====================

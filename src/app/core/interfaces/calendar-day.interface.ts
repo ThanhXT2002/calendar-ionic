@@ -11,3 +11,29 @@ export interface ICalendarDay {
   isSelected: boolean;
   isCurrentMonth: boolean;
 }
+
+
+export interface ISolarTerm {
+  name: string;
+  date: Date;
+  type: 'tiết' | 'khí';
+}
+
+export interface IGoodHour {
+  name: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  isGood: boolean;
+  suitableFor: string[];
+}
+
+export interface IDayQuality {
+  isGoodDay: boolean;
+  quality: 'hoàng-đạo' | 'hắc-đạo';
+  truc: string; // Kiến trừ thập nhị khách
+  trucDescription: string;
+  suitableFor: string[];
+  avoidFor: string[];
+  conflictAges: string[]; // Tuổi xung khắc
+}

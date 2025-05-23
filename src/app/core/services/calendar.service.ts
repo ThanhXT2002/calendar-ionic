@@ -173,6 +173,17 @@ export class CalendarService {
     return this.lunarCalendarService.getDayCanChi(date);
   }
 
+  getMonthCanChi(date: Date): string {
+    return this.lunarCalendarService.getMonthCanChi(date);
+  }
+
+  getYearCanChi(date: Date): string {
+    return this.lunarCalendarService.getYearCanChi(date);
+  }
+
+
+
+
   // ==================== CONVENIENCE METHODS ====================
 
   getTodayLunar(): { day: number; month: number; year: number; leap: boolean } {
