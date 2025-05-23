@@ -6,6 +6,7 @@ export interface ICalendarDay {
   lunarDay: number;
   lunarMonth: number;
   lunarYear: number;
+  leap?:boolean;
   isToday: boolean;
   isSelected: boolean;
   isCurrentMonth: boolean;

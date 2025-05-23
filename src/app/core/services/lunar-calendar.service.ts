@@ -11,6 +11,11 @@ export class LunarCalendarService {
 
   constructor() {}
 
+  // ==================== CORE CONVERSION METHODS ====================
+
+  /**
+   * Chuyển đổi từ lịch dương sang lịch âm
+   */
   solarToLunar(date: Date): {
     day: number;
     month: number;
@@ -26,90 +31,9 @@ export class LunarCalendarService {
     };
   }
 
-  getLunarYearName(year: number): string {
-    try {
-      const stemNames = [
-        'Giáp',
-        'Ất',
-        'Bính',
-        'Đinh',
-        'Mậu',
-        'Kỷ',
-        'Canh',
-        'Tân',
-        'Nhâm',
-        'Quý',
-      ];
-      const branchNames = [
-        'Tý',
-        'Sửu',
-        'Dần',
-        'Mão',
-        'Thìn',
-        'Tỵ',
-        'Ngọ',
-        'Mùi',
-        'Thân',
-        'Dậu',
-        'Tuất',
-        'Hợi',
-      ];
-
-      const canchi = this.calendar.getLunarYearStemBranch(year);
-      const stem = stemNames[canchi.stemIndex];
-      const branch = branchNames[canchi.branchIndex];
-
-      return `${stem} ${branch}`;
-    } catch (error) {
-      console.error('Lỗi khi lấy tên năm âm lịch:', error);
-      return '';
-    }
-  }
-
-  getDayCanChi(date: Date): string {
-    const dayNumber = this.calendar.getDayNumber(date);
-    const canchi = this.calendar.getLunarDayStemBranch(dayNumber);
-    const stemNames = [
-      'Giáp',
-      'Ất',
-      'Bính',
-      'Đinh',
-      'Mậu',
-      'Kỷ',
-      'Canh',
-      'Tân',
-      'Nhâm',
-      'Quý',
-    ];
-    const branchNames = [
-      'Tý',
-      'Sửu',
-      'Dần',
-      'Mão',
-      'Thìn',
-      'Tỵ',
-      'Ngọ',
-      'Mùi',
-      'Thân',
-      'Dậu',
-      'Tuất',
-      'Hợi',
-    ];
-
-    const stem = stemNames[canchi.stemIndex];
-    const branch = branchNames[canchi.branchIndex];
-
-    return `${stem} ${branch}`;
-  }
-
-  isSameDay(date1: Date, date2: Date): boolean {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
-  }
-
+  /**
+   * Chuyển đổi từ lịch âm sang lịch dương
+   */
   lunarToSolar(
     day: number,
     month: number,
@@ -121,6 +45,7 @@ export class LunarCalendarService {
         console.error('Ngày âm lịch không hợp lệ:', { day, month, year });
         return null;
       }
+
       const lunarDate = new LunarDate({
         day,
         month,
@@ -156,6 +81,43 @@ export class LunarCalendarService {
     }
   }
 
+  // ==================== LUNAR YEAR NAMES ====================
+
+  /**
+   * Lấy tên Can Chi của năm âm lịch
+   */
+  getLunarYearName(year: number): string {
+    const can = ['Canh', 'Tân', 'Nhâm', 'Quý', 'Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ'];
+    const chi = ['Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tị', 'Ngọ', 'Mùi'];
+
+    return can[year % 10] + ' ' + chi[year % 12];
+  }
+
+
+  /**
+   * Lấy Can Chi của ngày
+   */
+  getDayCanChi(date: Date): string {
+    const dayNumber = this.calendar.getDayNumber(date);
+    const canchi = this.calendar.getLunarDayStemBranch(dayNumber);
+
+    const stemNames = [
+      'Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu',
+      'Kỷ', 'Canh', 'Tân', 'Nhâm', 'Quý',
+    ];
+    const branchNames = [
+      'Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ',
+      'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi',
+    ];
+
+    const stem = stemNames[canchi.stemIndex];
+    const branch = branchNames[canchi.branchIndex];
+
+    return `${stem} ${branch}`;
+  }
+
+  // ==================== VALIDATION METHODS ====================
+
   /**
    * Kiểm tra ngày âm lịch có hợp lệ không
    */
@@ -182,6 +144,8 @@ export class LunarCalendarService {
     );
   }
 
+  // ==================== PRIVATE HELPER METHODS ====================
+
   /**
    * Fallback method nếu lunar-date-vn không hoạt động
    */
@@ -193,15 +157,11 @@ export class LunarCalendarService {
     console.warn('Sử dụng fallback method cho chuyển đổi âm → dương');
 
     try {
-      // Ước tính ngày dương lịch gần đúng
       const estimatedYear = year;
       const estimatedMonth = Math.max(0, month - 1);
-
-      // Tìm kiếm trong phạm vi ±45 ngày từ ước tính
       const searchStart = new Date(estimatedYear, estimatedMonth, day - 45);
       const searchEnd = new Date(estimatedYear, estimatedMonth + 2, day + 45);
 
-      // Duyệt từng ngày để tìm kết quả
       for (
         let d = new Date(searchStart);
         d <= searchEnd;

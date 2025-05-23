@@ -1,14 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonInput } from '@ionic/angular/standalone';
-import { ExploreContainerComponent } from '../components/explore-container/explore-container.component';
+import { IonButton, IonContent } from '@ionic/angular/standalone';
 import { ICalendarDay } from '../core/interfaces/calendar-day.interface';
 import { Subscription } from 'rxjs';
 import { CalendarService } from '../core/services/calendar.service';
 import { CommonModule } from '@angular/common';
 import { isPlatform } from '@ionic/core';
-import { Form, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LunarCalendarService } from '../core/services/lunar-calendar.service';
-
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-tab2',
@@ -32,7 +29,6 @@ export class Tab2Page implements OnInit, OnDestroy {
   isIOS = isPlatform('ios');
   isAndroid = isPlatform('android');
   isBoxSearch: boolean = false;
-  searchTerm = '';
   searchForm!: FormGroup;
   today = new Date();
   errorMessage = '';
@@ -40,13 +36,12 @@ export class Tab2Page implements OnInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
   constructor(
-    private calendarService: CalendarService,
-    private lunarCalendarService: LunarCalendarService,
+    private calendarService: CalendarService, // Chỉ cần CalendarService
     private fb: FormBuilder
   ) {
     this.searchForm = this.fb.group({
       day: [
-       "",
+        "",
         [
           Validators.required,
           Validators.min(1),
@@ -76,7 +71,6 @@ export class Tab2Page implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-
     // Đăng ký lắng nghe sự thay đổi ngày hiện tại
     this.subscriptions.add(
       this.calendarService.currentDate$.subscribe((date) => {
@@ -99,11 +93,11 @@ export class Tab2Page implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Hủy đăng ký khi component bị hủy
     this.subscriptions.unsubscribe();
   }
 
-  // Tải lại dữ liệu lịch
+  // ==================== CALENDAR METHODS ====================
+
   loadCalendarDays() {
     this.days = this.calendarService.getMonthDays();
     // Tìm ngày được chọn
@@ -113,31 +107,37 @@ export class Tab2Page implements OnInit, OnDestroy {
     }
   }
 
-  // Chọn một ngày
   selectDate(day: ICalendarDay) {
     this.calendarService.setSelectedDate(day.date);
     this.selectedDay = day;
   }
 
-  // Chuyển đến tháng trước
   previousMonth() {
     this.calendarService.previousMonth();
   }
 
-  // Chuyển đến tháng sau
   nextMonth() {
     this.calendarService.nextMonth();
   }
 
-  // Lấy tên tháng âm lịch
+  // ==================== DISPLAY HELPERS ====================
+
   getLunarMonthName(month: number): string {
     return this.calendarService.getLunarMonthName(month);
   }
 
-  // Lấy tên năm âm lịch
   getLunarYearName(year: number): string {
     return this.calendarService.getLunarYearName(year);
   }
+
+  getMarginTopClass(): string {
+    if (this.isIOS) {
+      return 'mt-11';
+    }
+    return 'mt-14';
+  }
+
+  // ==================== SEARCH BOX METHODS ====================
 
   toggleBoxSearch(): void {
     this.isBoxSearch = !this.isBoxSearch;
@@ -159,16 +159,14 @@ export class Tab2Page implements OnInit, OnDestroy {
     const month = +this.searchForm.get('month')?.value;
     const year = +this.searchForm.get('year')?.value;
 
-    // Sử dụng service để validate
-    if (!this.lunarCalendarService.isValidSolarDate(day, month, year)) {
-      this.errorMessage = 'Ngày dương lịch không hợp lệ';
-      return;
-    }
+    // Sử dụng CalendarService để search
+    const success = this.calendarService.searchSolarDate(day, month, year);
 
-    const date = new Date(year, month - 1, day);
-    this.calendarService.setCurrentDate(date);
-    this.calendarService.setSelectedDate(date);
-    this.closeSearchBox();
+    if (success) {
+      this.closeSearchBox();
+    } else {
+      this.errorMessage = 'Ngày dương lịch không hợp lệ';
+    }
   }
 
   onSearchLunar(): void {
@@ -181,29 +179,17 @@ export class Tab2Page implements OnInit, OnDestroy {
     const month = +this.searchForm.get('month')?.value;
     const year = +this.searchForm.get('year')?.value;
 
-    // Sử dụng service để chuyển đổi âm → dương
-    const solarDate = this.lunarCalendarService.lunarToSolar(day, month, year);
+    // Sử dụng CalendarService để search
+    const success = this.calendarService.searchLunarDate(day, month, year);
 
-    if (solarDate) {
-      this.calendarService.setCurrentDate(solarDate);
-      this.calendarService.setSelectedDate(solarDate);
+    if (success) {
       this.closeSearchBox();
     } else {
       this.errorMessage = 'Ngày âm lịch không hợp lệ hoặc không tồn tại';
-      // Thử tháng nhuận nếu tháng thường không có
-      const leapResult = this.lunarCalendarService.lunarToSolar(
-        day,
-        month,
-        year,
-        true
-      );
-      if (leapResult) {
-        this.calendarService.setCurrentDate(leapResult);
-        this.calendarService.setSelectedDate(leapResult);
-        this.closeSearchBox();
-      }
     }
   }
+
+  // ==================== FORM HELPERS ====================
 
   onFocus(controlName: 'day' | 'month' | 'year') {
     this.searchForm.get(controlName)?.setValue('');
@@ -220,7 +206,8 @@ export class Tab2Page implements OnInit, OnDestroy {
     });
   }
 
-  // Quick actions
+  // ==================== QUICK ACTIONS ====================
+
   fillTodayInForm(): void {
     const today = new Date();
     this.searchForm.patchValue({
@@ -232,19 +219,11 @@ export class Tab2Page implements OnInit, OnDestroy {
 
   fillTodayLunarInForm(): void {
     const today = new Date();
-    const lunar = this.lunarCalendarService.solarToLunar(today);
+    const lunar = this.calendarService.solarToLunar(today);
     this.searchForm.patchValue({
       day: lunar.day,
       month: lunar.month,
       year: lunar.year,
     });
-  }
-
-  getMarginTopClass(): string {
-    if (this.isIOS) {
-      return 'mt-11';
-    }
-
-    return 'mt-14';
   }
 }

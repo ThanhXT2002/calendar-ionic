@@ -7,7 +7,7 @@ import { ICalendarDay } from '../interfaces/calendar-day.interface';
   providedIn: 'root'
 })
 export class CalendarService {
-private today = new Date();
+  private today = new Date();
   private currentDate = new BehaviorSubject<Date>(this.today);
   private selectedDate = new BehaviorSubject<Date>(this.today);
 
@@ -16,41 +16,38 @@ private today = new Date();
 
   constructor(private lunarCalendarService: LunarCalendarService) {}
 
-  // Lấy ngày hiện tại
+  // ==================== DATE MANAGEMENT ====================
+
   getCurrentDate(): Date {
     return this.currentDate.value;
   }
 
-  // Cập nhật ngày hiện tại
   setCurrentDate(date: Date): void {
     this.currentDate.next(date);
   }
 
-  // Lấy ngày được chọn
   getSelectedDate(): Date {
     return this.selectedDate.value;
   }
 
-  // Cập nhật ngày được chọn
   setSelectedDate(date: Date): void {
     this.selectedDate.next(date);
   }
 
-  // Chuyển đến tháng trước
   previousMonth(): void {
     const current = this.getCurrentDate();
     const previous = new Date(current.getFullYear(), current.getMonth() - 1, 1);
     this.setCurrentDate(previous);
   }
 
-  // Chuyển đến tháng sau
   nextMonth(): void {
     const current = this.getCurrentDate();
     const next = new Date(current.getFullYear(), current.getMonth() + 1, 1);
     this.setCurrentDate(next);
   }
 
-  // Lấy danh sách ngày trong tháng hiện tại (lịch dương)
+  // ==================== CALENDAR DAYS ====================
+
   getMonthDays(): ICalendarDay[] {
     const days: ICalendarDay[] = [];
     const current = this.getCurrentDate();
@@ -59,12 +56,8 @@ private today = new Date();
     const year = current.getFullYear();
     const month = current.getMonth();
 
-    // Ngày đầu tiên của tháng
     const firstDayOfMonth = new Date(year, month, 1);
-    // Ngày cuối cùng của tháng
     const lastDayOfMonth = new Date(year, month + 1, 0);
-
-    // Lấy ngày trong tuần của ngày đầu tiên (0 = Chủ nhật, 1 = Thứ hai,...)
     const firstDayOfWeek = firstDayOfMonth.getDay();
 
     // Thêm các ngày của tháng trước
@@ -105,7 +98,7 @@ private today = new Date();
     }
 
     // Thêm các ngày của tháng sau
-    const remainingDays = 42 - days.length; // 6 hàng x 7 cột = 42 ô
+    const remainingDays = 42 - days.length;
     for (let i = 1; i <= remainingDays; i++) {
       const date = new Date(year, month + 1, i);
       const lunar = this.solarToLunar(date);
@@ -126,44 +119,100 @@ private today = new Date();
     return days;
   }
 
-  // Chuyển đổi từ lịch dương sang lịch âm
-  solarToLunar(date: Date): { day: number, month: number, year: number } {
+  // ==================== LUNAR CALENDAR CONVERSIONS ====================
+
+  solarToLunar(date: Date): { day: number; month: number; year: number; leap: boolean } {
     return this.lunarCalendarService.solarToLunar(date);
   }
 
+  lunarToSolar(day: number, month: number, year: number, isLeapMonth: boolean = false): Date | null {
+    return this.lunarCalendarService.lunarToSolar(day, month, year, isLeapMonth);
+  }
 
+  // ==================== VALIDATIONS ====================
 
-  // So sánh hai ngày
+  isValidLunarDate(day: number, month: number, year: number): boolean {
+    return this.lunarCalendarService.isValidLunarDate(day, month, year);
+  }
+
+  isValidSolarDate(day: number, month: number, year: number): boolean {
+    return this.lunarCalendarService.isValidSolarDate(day, month, year);
+  }
+
   isSameDay(date1: Date, date2: Date): boolean {
     return date1.getDate() === date2.getDate() &&
            date1.getMonth() === date2.getMonth() &&
            date1.getFullYear() === date2.getFullYear();
   }
 
-  // Lấy tên tháng
+  // ==================== DISPLAY NAMES ====================
+
   getMonthName(month: number): string {
-    const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-                        'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+    const monthNames = [
+      'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4',
+      'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8',
+      'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+    ];
     return monthNames[month];
   }
 
-  // Lấy tên tháng âm lịch
   getLunarMonthName(month: number): string {
-    const monthNames = ['Tháng Giêng', 'Tháng Hai', 'Tháng Ba', 'Tháng Tư', 'Tháng Năm', 'Tháng Sáu',
-                        'Tháng Bảy', 'Tháng Tám', 'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Chạp'];
+    const monthNames = [
+      'Tháng Giêng', 'Tháng Hai', 'Tháng Ba', 'Tháng Tư',
+      'Tháng Năm', 'Tháng Sáu', 'Tháng Bảy', 'Tháng Tám',
+      'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Chạp'
+    ];
     return monthNames[month - 1];
   }
 
-  // Lấy tên Can Chi cho năm
   getLunarYearName(year: number): string {
-    const can = ['Canh', 'Tân', 'Nhâm', 'Quý', 'Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ'];
-    const chi = ['Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tị', 'Ngọ', 'Mùi'];
-
-    return can[year % 10] + ' ' + chi[year % 12];
+    return this.lunarCalendarService.getLunarYearName(year);
   }
 
-  // Lấy ngày âm lịch tương ứng với ngày dương lịch
-  getLunarDateForSolar(solarDate: Date): { day: number, month: number, year: number } {
+  getDayCanChi(date: Date): string {
+    return this.lunarCalendarService.getDayCanChi(date);
+  }
+
+  // ==================== CONVENIENCE METHODS ====================
+
+  getTodayLunar(): { day: number; month: number; year: number; leap: boolean } {
+    return this.solarToLunar(this.today);
+  }
+
+  getLunarDateForSolar(solarDate: Date): { day: number; month: number; year: number; leap: boolean } {
     return this.solarToLunar(solarDate);
+  }
+
+  // ==================== SEARCH HELPERS ====================
+
+  searchSolarDate(day: number, month: number, year: number): boolean {
+    if (!this.isValidSolarDate(day, month, year)) {
+      return false;
+    }
+
+    const date = new Date(year, month - 1, day);
+    this.setCurrentDate(date);
+    this.setSelectedDate(date);
+    return true;
+  }
+
+  searchLunarDate(day: number, month: number, year: number): boolean {
+    const solarDate = this.lunarToSolar(day, month, year);
+
+    if (solarDate) {
+      this.setCurrentDate(solarDate);
+      this.setSelectedDate(solarDate);
+      return true;
+    }
+
+    // Thử tháng nhuận nếu tháng thường không có
+    const leapResult = this.lunarToSolar(day, month, year, true);
+    if (leapResult) {
+      this.setCurrentDate(leapResult);
+      this.setSelectedDate(leapResult);
+      return true;
+    }
+
+    return false;
   }
 }
