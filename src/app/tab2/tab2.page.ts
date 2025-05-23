@@ -31,7 +31,7 @@ export class Tab2Page implements OnInit, OnDestroy {
   currentMonthName: string = '';
   isIOS = isPlatform('ios');
   isAndroid = isPlatform('android');
-  isBoxSearch: boolean = true;
+  isBoxSearch: boolean = false;
   searchTerm = '';
   searchForm!: FormGroup;
   today = new Date();
@@ -46,7 +46,7 @@ export class Tab2Page implements OnInit, OnDestroy {
   ) {
     this.searchForm = this.fb.group({
       day: [
-        this.today.getDate(),
+       "",
         [
           Validators.required,
           Validators.min(1),
@@ -55,7 +55,7 @@ export class Tab2Page implements OnInit, OnDestroy {
         ],
       ],
       month: [
-        this.today.getMonth() + 1,
+        "",
         [
           Validators.required,
           Validators.min(1),
@@ -64,7 +64,7 @@ export class Tab2Page implements OnInit, OnDestroy {
         ],
       ],
       year: [
-        this.today.getFullYear(),
+        "",
         [
           Validators.required,
           Validators.min(1900),

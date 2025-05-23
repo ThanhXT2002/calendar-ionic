@@ -1,9 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon } from '@ionic/angular/standalone';
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonIcon,
+} from '@ionic/angular/standalone';
 import { ExploreContainerComponent } from '../components/explore-container/explore-container.component';
 import { CalendarService } from '../core/services/calendar.service';
 import { CommonModule, DatePipe } from '@angular/common';
-import { calendarOutline, giftOutline, moonOutline, starOutline } from 'ionicons/icons';
+import {
+  calendarOutline,
+  giftOutline,
+  moonOutline,
+  starOutline,
+} from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { LunarCalendarService } from '../core/services/lunar-calendar.service';
 import { Festivals } from '../core/data/festivals.data';
@@ -11,16 +22,17 @@ import { MemorialDays } from '../core/data/memorial-days.data';
 import { isPlatform } from '@ionic/angular/standalone';
 import { TextToSpeechService } from '../core/services/text-to-speech.service';
 
-
 export interface IUpcomingEvent {
   name: string;
   description?: string;
   daysUntil: number;
+  date: Date;
   isLunar: boolean;
   type: 'festival' | 'memorial';
   iconName: string;
   bgColor: string;
   textColor: string;
+  displayText: string; // "Hôm nay", "Ngày mai", "Còn X ngày"
 }
 
 type SpeakType = 'solar' | 'lunar';
@@ -33,10 +45,11 @@ type SpeakType = 'solar' | 'lunar';
 })
 export class Tab1Page implements OnInit {
   today: Date = new Date();
-  lunarDate: { day: number; month: number; year: number } = {
+  lunarDate: { day: number; month: number; year: number; leap: boolean } = {
     day: 15,
     month: 5,
     year: 2025,
+    leap: false,
   };
 
   upcomingEvents: IUpcomingEvent[] = [];
@@ -51,7 +64,8 @@ export class Tab1Page implements OnInit {
     private lunarCalendarService: LunarCalendarService,
     private tts: TextToSpeechService
   ) {
-    this.lunarDate = this.calendarService.getLunarDateForSolar(this.today);
+    // Sử dụng service để lấy ngày âm lịch
+    this.lunarDate = this.lunarCalendarService.solarToLunar(this.today);
   }
 
   ngOnInit() {
@@ -61,92 +75,131 @@ export class Tab1Page implements OnInit {
 
   calculateUpcomingEvents() {
     const currentDate = new Date();
-    let nextFestival: IUpcomingEvent | null = null;
-    let nextMemorial: IUpcomingEvent | null = null;
+    const events: IUpcomingEvent[] = [];
+    const maxDays = 30; // Hiển thị sự kiện trong 30 ngày tới
 
-    // Tìm lễ hội gần nhất
-    let minFestivalDays = Infinity;
+    // Tìm tất cả sự kiện lễ hội trong 30 ngày
     Festivals.forEach((festival) => {
       const eventDate = this.getEventDate(
         festival.date,
         festival.month,
         festival.isLunar
       );
-      if (eventDate >= currentDate) {
+
+      if (eventDate) {
         const daysUntil = Math.ceil(
           (eventDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)
         );
-        if (daysUntil < minFestivalDays) {
-          minFestivalDays = daysUntil;
-          nextFestival = {
+
+        // Bao gồm sự kiện từ hôm nay đến 30 ngày tới
+        if (daysUntil >= 0 && daysUntil <= maxDays) {
+          events.push({
             name: festival.name,
             description: festival.description,
             daysUntil,
+            date: eventDate,
             isLunar: festival.isLunar,
             type: 'festival',
             iconName: 'fa-solid fa-fire-flame-curved',
             bgColor: 'bg-green-300',
             textColor: 'text-green-600',
-          };
+            displayText: this.getDisplayText(daysUntil),
+          });
         }
       }
     });
 
-    // Tìm ngày kỷ niệm gần nhất
-    let minMemorialDays = Infinity;
+    // Tìm tất cả ngày kỷ niệm trong 30 ngày
     MemorialDays.forEach((memorial) => {
       const eventDate = this.getEventDate(
         memorial.date,
         memorial.month,
         memorial.isLunar
       );
-      if (eventDate >= currentDate) {
+
+      if (eventDate) {
         const daysUntil = Math.ceil(
           (eventDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)
         );
-        if (daysUntil < minMemorialDays) {
-          minMemorialDays = daysUntil;
-          nextMemorial = {
+
+        // Bao gồm sự kiện từ hôm nay đến 30 ngày tới
+        if (daysUntil >= 0 && daysUntil <= maxDays) {
+          events.push({
             name: memorial.name,
             description: memorial.description,
             daysUntil,
+            date: eventDate,
             isLunar: memorial.isLunar,
             type: 'memorial',
             iconName: 'fa-regular fa-star',
             bgColor: 'bg-purple-300',
             textColor: 'text-purple-600',
-          };
+            displayText: this.getDisplayText(daysUntil),
+          });
         }
       }
     });
 
-    // Tạo mảng các sự kiện (chỉ có tối đa 2 sự kiện)
-    this.upcomingEvents = [];
-    if (nextFestival) {
-      this.upcomingEvents.push(nextFestival);
-    }
-    if (nextMemorial) {
-      this.upcomingEvents.push(nextMemorial);
-    }
-
-    // Sắp xếp theo thời gian
-    this.upcomingEvents.sort((a, b) => a.daysUntil - b.daysUntil);
+    // Sắp xếp theo thời gian và chỉ lấy 10 sự kiện gần nhất
+    this.upcomingEvents = events
+      .sort((a, b) => a.daysUntil - b.daysUntil)
+      .slice(0, 10);
   }
 
-  private getEventDate(day: number, month: number, isLunar: boolean): Date {
+  private getDisplayText(daysUntil: number): string {
+    if (daysUntil === 0) {
+      return 'Hôm nay';
+    } else if (daysUntil === 1) {
+      return 'Ngày mai';
+    } else {
+      return `Còn ${daysUntil} ngày`;
+    }
+  }
+
+  private getEventDate(
+    day: number,
+    month: number,
+    isLunar: boolean
+  ): Date | null {
     const currentYear = new Date().getFullYear();
-    let eventDate: Date;
+    let eventDate: Date | null = null;
 
     if (isLunar) {
-      // Chuyển đổi từ ngày âm lịch sang dương lịch
-      eventDate = this.convertLunarToSolar(day, month, currentYear);
+      // Sử dụng service để chuyển đổi từ ngày âm lịch sang dương lịch
+      eventDate = this.lunarCalendarService.lunarToSolar(
+        day,
+        month,
+        currentYear
+      );
 
-      // Nếu ngày âm lịch đã qua trong năm hiện tại, sử dụng năm tiếp theo
-      if (eventDate < new Date()) {
-        eventDate = this.convertLunarToSolar(day, month, currentYear + 1);
+      // Nếu ngày âm lịch đã qua trong năm hiện tại, thử năm tiếp theo
+      if (!eventDate || eventDate < new Date()) {
+        eventDate = this.lunarCalendarService.lunarToSolar(
+          day,
+          month,
+          currentYear + 1
+        );
+      }
+
+      // Nếu vẫn không có, thử tháng nhuận
+      if (!eventDate) {
+        eventDate = this.lunarCalendarService.lunarToSolar(
+          day,
+          month,
+          currentYear,
+          true
+        );
+        if (!eventDate || eventDate < new Date()) {
+          eventDate = this.lunarCalendarService.lunarToSolar(
+            day,
+            month,
+            currentYear + 1,
+            true
+          );
+        }
       }
     } else {
-      // Ngày dương lịch
+      // Ngày dương lịch - sử dụng Date constructor thông thường
       eventDate = new Date(currentYear, month - 1, day);
 
       // Nếu ngày dương lịch đã qua trong năm hiện tại, sử dụng năm tiếp theo
@@ -158,90 +211,22 @@ export class Tab1Page implements OnInit {
     return eventDate;
   }
 
-  private convertLunarToSolar(
-    lunarDay: number,
-    lunarMonth: number,
-    lunarYear: number
-  ): Date {
-    // Sử dụng phương pháp xấp xỉ thông minh để tìm ngày dương lịch
-    try {
-      // Bắt đầu từ ngày gần đúng (tháng 2 trong năm dương lịch thường tương ứng với tháng 1 âm lịch)
-      let estimatedMonth = Math.max(0, lunarMonth - 1);
-      let estimatedYear = lunarYear;
-
-      // Tìm kiếm trong khoảng ±60 ngày từ ngày ước tính
-      let searchStartDate = new Date(
-        estimatedYear,
-        estimatedMonth,
-        lunarDay - 30
-      );
-      let searchEndDate = new Date(
-        estimatedYear,
-        estimatedMonth,
-        lunarDay + 30
-      );
-
-      // Duyệt qua các ngày trong khoảng tìm kiếm
-      for (
-        let d = new Date(searchStartDate);
-        d <= searchEndDate;
-        d.setDate(d.getDate() + 1)
-      ) {
-        const lunarInfo = this.lunarCalendarService.solarToLunar(new Date(d));
-        if (
-          lunarInfo.day === lunarDay &&
-          lunarInfo.month === lunarMonth &&
-          lunarInfo.year === lunarYear
-        ) {
-          return new Date(d);
-        }
-      }
-
-      // Nếu không tìm thấy trong khoảng đầu tiên, mở rộng tìm kiếm
-      searchStartDate = new Date(estimatedYear, 0, 1);
-      searchEndDate = new Date(estimatedYear, 11, 31);
-
-      for (
-        let d = new Date(searchStartDate);
-        d <= searchEndDate;
-        d.setDate(d.getDate() + 1)
-      ) {
-        const lunarInfo = this.lunarCalendarService.solarToLunar(new Date(d));
-        if (
-          lunarInfo.day === lunarDay &&
-          lunarInfo.month === lunarMonth &&
-          lunarInfo.year === lunarYear
-        ) {
-          return new Date(d);
-        }
-      }
-
-      // Fallback nếu không tìm thấy
-      console.warn(
-        `Không tìm thấy ngày dương lịch cho: ${lunarDay}/${lunarMonth}/${lunarYear}`
-      );
-      return new Date(estimatedYear, estimatedMonth, lunarDay);
-    } catch (error) {
-      console.error('Lỗi khi chuyển đổi âm lịch sang dương lịch:', error);
-      return new Date(lunarYear, lunarMonth - 1, lunarDay);
-    }
-  }
-
   getLunarMonthName(month: number): string {
     return this.calendarService.getLunarMonthName(month);
   }
 
   getLunarYearName(year: number): string {
-    return this.calendarService.getLunarYearName(year);
+    // Sử dụng service lunar để lấy tên năm chính xác
+    return this.lunarCalendarService.getLunarYearName(year);
   }
 
   trackByFn(index: number, item: IUpcomingEvent): string {
-    return item.name;
+    return `${item.name}_${item.date.getTime()}`;
   }
 
-  // Hàm chung để phát âm thanh
+  // Hàm chung để phát âm thanh với cache localStorage
   private speakWithLocalStorage(text: string, type: SpeakType): void {
-    const today = new Date().toISOString().split('T')[0]; // Lấy ngày hôm nay dạng YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0];
     const storageKey = `voice_${type}_${today}`;
 
     // Kiểm tra cache trong localStorage
@@ -252,7 +237,6 @@ export class Tab1Page implements OnInit {
     if (cachedVoice && cachedDate === today) {
       console.log(`Sử dụng voice ${type} từ cache`);
 
-      // Chỉ đặt trạng thái isSpeaking, không đặt loading
       if (type === 'solar') {
         this.isSpeakingSolar = true;
       } else {
@@ -263,7 +247,7 @@ export class Tab1Page implements OnInit {
       return;
     }
 
-    // Nếu không có cache, đặt cả loading và isSpeaking là true
+    // Nếu không có cache, gọi API
     if (type === 'solar') {
       this.loadingSolar = true;
       this.isSpeakingSolar = true;
@@ -272,7 +256,6 @@ export class Tab1Page implements OnInit {
       this.isSpeakingLunar = true;
     }
 
-    // Gọi API
     this.tts.speak(text).subscribe({
       next: (res) => {
         if (type === 'solar') {
@@ -322,6 +305,15 @@ export class Tab1Page implements OnInit {
         this.isSpeakingLunar = false;
       }
     };
+
+    audio.onerror = () => {
+      console.error('Lỗi khi phát audio');
+      if (type === 'solar') {
+        this.isSpeakingSolar = false;
+      } else {
+        this.isSpeakingLunar = false;
+      }
+    };
   }
 
   // Hàm phát âm lịch dương
@@ -340,11 +332,10 @@ export class Tab1Page implements OnInit {
 
   // Hàm phát âm lịch âm
   speakTodayDateLunar(): void {
-    const formattedDate = `Âm lịch hôm nay là ngày ${
-      this.lunarDate.day
-    } ${this.getLunarMonthName(
-      this.lunarDate.month
-    )} năm ${this.getLunarYearName(this.lunarDate.year)}`;
+    const lunarMonthName = this.getLunarMonthName(this.lunarDate.month);
+    const lunarYearName = this.getLunarYearName(this.lunarDate.year);
+
+    const formattedDate = `Âm lịch hôm nay là ngày ${this.lunarDate.day} ${lunarMonthName} năm ${lunarYearName}`;
 
     console.log('Formatted Date Lunar:', formattedDate);
 
@@ -355,7 +346,6 @@ export class Tab1Page implements OnInit {
     if (this.isIOS) {
       return 'mt-11';
     }
-
     return 'mt-14';
   }
 }

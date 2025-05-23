@@ -13,29 +13,29 @@
 
       <!-- Lịch dương -->
       <div
-        class="mb-4 p-4 bg-blue-300 rounded-lg"
+        class="mb-4 p-4 bg-blue-300 rounded-lg cursor-pointer hover:bg-blue-400 transition-colors"
         (click)="speakTodayDateSolar()"
       >
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="text-2xl font-semibold text-blue-700 ">Dương lịch</h3>
-        @if (loadingSolar) {
-          <i class="fa-solid fa-spinner text-2xl animate-spin"></i>
-        } @else {
-          <i
-            class="fa-solid fa-volume-high"
-            [ngClass]="{
-              'text-blue-900 text-3xl': isSpeakingSolar,
-              'text-gray-500 text-2xl': !isSpeakingSolar
-            }"
-          ></i>
-        }
-      </div>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-2xl font-semibold text-blue-700">Dương lịch</h3>
+          @if (loadingSolar) {
+            <i class="fa-solid fa-spinner text-2xl animate-spin text-blue-700"></i>
+          } @else {
+            <i
+              class="fa-solid fa-volume-high transition-all duration-200"
+              [ngClass]="{
+                'text-blue-900 text-3xl': isSpeakingSolar,
+                'text-gray-600 text-2xl': !isSpeakingSolar
+              }"
+            ></i>
+          }
+        </div>
 
         <div class="flex justify-between text-xl">
           <div>
-            <p class="text-4xl font-bold">{{ today | date: 'dd' }}</p>
-            <p>Tháng {{ today | date: 'MM' }}</p>
-            <p>Năm {{ today | date: 'yyyy' }}</p>
+            <p class="text-4xl font-bold text-blue-800">{{ today | date: 'dd' }}</p>
+            <p class="text-blue-700">Tháng {{ today | date: 'MM' }}</p>
+            <p class="text-blue-700">Năm {{ today | date: 'yyyy' }}</p>
           </div>
           <div class="flex items-center">
             <i class="fa-solid fa-sun text-7xl text-blue-500"></i>
@@ -44,17 +44,20 @@
       </div>
 
       <!-- Lịch âm -->
-      <div class="p-4 bg-red-300 rounded-lg" (click)="speakTodayDateLunar()">
+      <div
+        class="p-4 bg-red-300 rounded-lg cursor-pointer hover:bg-red-400 transition-colors"
+        (click)="speakTodayDateLunar()"
+      >
         <div class="flex items-center justify-between mb-2">
           <h3 class="text-2xl font-semibold text-red-700">Âm lịch</h3>
           @if (loadingLunar) {
-            <i class="fa-solid fa-spinner text-2xl animate-spin"></i>
+            <i class="fa-solid fa-spinner text-2xl animate-spin text-red-700"></i>
           } @else {
             <i
-              class="fa-solid fa-volume-high"
+              class="fa-solid fa-volume-high transition-all duration-200"
               [ngClass]="{
                 'text-red-900 text-3xl': isSpeakingLunar,
-                'text-gray-500 text-2xl': !isSpeakingLunar
+                'text-gray-600 text-2xl': !isSpeakingLunar
               }"
             ></i>
           }
@@ -62,11 +65,15 @@
 
         <div class="flex justify-between text-xl">
           <div>
-            <p class="text-4xl font-bold">{{ lunarDate.day }}</p>
-            <p>{{ getLunarMonthName(lunarDate.month) }}</p>
-            <p>
-              Năm {{ getLunarYearName(lunarDate.year) }} ({{ lunarDate.year }})
+            <p class="text-4xl font-bold text-red-800">{{ lunarDate.day }}</p>
+            <p class="text-red-700">{{ getLunarMonthName(lunarDate.month) }}</p>
+            <p class="text-red-700 text-sm">
+              Năm {{ getLunarYearName(lunarDate.year) }}
             </p>
+            <p class="text-red-700 text-sm">({{ lunarDate.year }})</p>
+            @if (lunarDate.leap) {
+              <p class="text-red-600 text-xs font-semibold">Tháng nhuận</p>
+            }
           </div>
           <div class="flex items-center">
             <i class="fa-solid fa-moon text-7xl text-red-500"></i>
@@ -76,39 +83,82 @@
     </div>
 
     <!-- Các sự kiện sắp tới -->
-    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-3">
-      <h3 class="text-xl font-semibold mb-3 text-gray-700">
-        Các sự kiện sắp tới
-      </h3>
-      <ul class="space-y-1">
-        <li
-          *ngFor="let event of upcomingEvents; trackBy: trackByFn"
-          class="flex items-center p-2"
-        >
-          <div
-            [class]="'w-14 h-14 flex items-center justify-center rounded-full mr-4 ' + event.bgColor + ' ' + event.textColor"
+    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xl font-semibold text-gray-700">
+          <i class="fa-solid fa-calendar-days text-lg mr-1"></i>
+          Sự kiện sắp tới
+        </h3>
+        <span class="text-sm text-gray-500">
+          ({{ upcomingEvents.length }} sự kiện)
+        </span>
+      </div>
+
+      <div class="md:max-h-[426px] overflow-y-auto  scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+        <ul class="space-y-2">
+          <li
+            *ngFor="let event of upcomingEvents; trackBy: trackByFn"
+            class="flex items-start p-3 rounded-lg border transition-colors"
+            [ngClass]="{
+              'bg-yellow-50 border-yellow-200': event.daysUntil === 0,
+              'bg-green-50 border-green-200': event.daysUntil === 1,
+              'bg-gray-50 border-gray-200': event.daysUntil > 1
+            }"
           >
-            <i [ngClass]="event.iconName" class="text-3xl"></i>
-          </div>
-          <div class="flex-1">
-            <p class="font-medium text-gray-600">{{event.name}}</p>
-            <div class="flex items-center text-sm text-gray-500">
-              <span>Còn {{event.daysUntil}} ngày</span>
-              <span
-                [class]="'ml-2 px-2 py-0.5 rounded text-xs ' + (event.isLunar ? 'bg-red-200 text-blue-800' : 'bg-gray-200 text-gray-800')"
-              >
-                {{event.isLunar ? 'Âm lịch' : 'Dương lịch'}}
-              </span>
+            <div
+              [ngClass]="'w-12 h-12 flex items-center justify-center rounded-full mr-3 flex-shrink-0 ' + event.bgColor + ' ' + event.textColor"
+            >
+              <i [ngClass]="event.iconName" class="text-2xl"></i>
             </div>
-          </div>
-        </li>
-        <li
-          *ngIf="upcomingEvents.length === 0"
-          class="text-center text-gray-500 py-4"
-        >
-          Không có sự kiện sắp tới
-        </li>
-      </ul>
+
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-gray-800 text-sm leading-tight">
+                {{ event.name }}
+              </p>
+
+              <div class="flex flex-wrap items-center gap-2 mt-1">
+                <span
+                  class="text-xs px-2 py-1 rounded-full font-medium"
+                  [ngClass]="{
+                    'bg-red-100 text-red-700': event.daysUntil === 0,
+                    'bg-green-100 text-green-700': event.daysUntil === 1,
+                    'bg-blue-100 text-blue-700': event.daysUntil > 1
+                  }"
+                >
+                  {{ event.displayText }}
+                </span>
+
+                <span
+                  [ngClass]="'text-xs px-2 py-1 rounded-full ' + (event.isLunar ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700')"
+                >
+                  {{ event.isLunar ? 'Âm lịch' : 'Dương lịch' }}
+                </span>
+
+                <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+                  {{ event.type === 'festival' ? 'Lễ hội' : 'Kỷ niệm' }}
+                </span>
+              </div>
+
+              <p class="text-xs text-gray-500 mt-1">
+                {{ event.date | date: 'dd/MM/yyyy' }}
+              </p>
+
+              @if (event.description) {
+                <p class="text-xs text-gray-600 mt-1 line-clamp-2">
+                  {{ event.description }}
+                </p>
+              }
+            </div>
+          </li>
+
+          @if (upcomingEvents.length === 0) {
+            <li class="text-center text-gray-500 py-8">
+              <i class="fa-regular fa-calendar text-4xl mb-2 block"></i>
+              <p>Không có sự kiện trong 30 ngày tới</p>
+            </li>
+          }
+        </ul>
+      </div>
     </div>
   </div>
 </ion-content>

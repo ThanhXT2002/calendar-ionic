@@ -38,6 +38,7 @@
     "lunar-calendar": "0.1.4",
     "lunar-date-vn": "^1.0.6",
     "rxjs": "7.8.0",
+    "tailwind-scrollbar": "^4.0.2",
     "tslib": "2.3.0",
     "viet-lunar-calendar": "1.0.9",
     "zone.js": "0.15.0"
