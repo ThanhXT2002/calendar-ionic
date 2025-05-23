@@ -1,6 +1,7 @@
 <ion-header [translucent]="true">
-  <ion-toolbar >
-    <ion-title class="w-full flex justify-center">
+  <ion-toolbar [ngClass]="getPadingClass()">
+    <ion-title class="w-full flex justify-center text-2xl "
+    [ngClass]="getMarginTopClass()">
      {{ name }}
     </ion-title>
   </ion-toolbar>

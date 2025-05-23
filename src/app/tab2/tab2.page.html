@@ -5,22 +5,65 @@
 [ngClass]="getMarginTopClass()"
 >
 <div class="flex flex-col md:flex-row items-center justify-center md:items-start md:gap-x-10">
-  <div class="max-w-md  bg-white rounded-lg shadow-lg p-3">
+  <div class="w-full md:max-w-md  bg-white rounded-lg shadow-lg p-3">
     <!-- Điều hướng tháng -->
-<div class="flex justify-between items-center mb-4">
-  <ion-button fill="clear" (click)="previousMonth()">
-    <i class="fa-solid fa-caret-left text-xl text-black"></i>
-  </ion-button>
+    <div class="flex justify-between items-center mb-4 relative">
+      <ion-button fill="clear" (click)="previousMonth()">
+        <i class="fa-solid fa-caret-left text-xl text-black"></i>
+      </ion-button>
 
-  <div class="text-center">
-    <h2 class="text-xl font-bold">{{ currentMonthName }} - {{ currentYear }}</h2>
-  </div>
+      <div class="text-center">
+        <h2
+        (click)="toggleBoxSearch()"
+        class="text-xl font-bold cursor-pointer">
+          {{ currentMonthName }} - {{ currentYear }}
+          <i class="fa-solid fa-angle-down transition-transform duration-300"
+             [ngClass]="{'rotate-180': isBoxSearch}"></i>
+        </h2>
+      </div>
 
-  <ion-button fill="clear" (click)="nextMonth()">
-    <i class="fa-solid fa-caret-right text-xl text-black"></i>
-    <!-- <ion-icon slot="icon-only" name="caret-forward" class="text-black"></ion-icon> -->
-  </ion-button>
-</div>
+      <ion-button fill="clear" (click)="nextMonth()">
+        <i class="fa-solid fa-caret-right text-xl text-black"></i>
+      </ion-button>
+
+      <!-- Thay @if bằng cách này để có hiệu ứng -->
+      <div class="absolute top-14 left-0 w-full bg-white rounded-lg shadow-md border border-gray-300 p-2 z-10
+                  transition-all duration-300 ease-out transform"
+           [ngClass]="{
+             'opacity-100 translate-y-0 visible scale-100': isBoxSearch,
+             'opacity-0 -translate-y-2 invisible scale-95': !isBoxSearch
+           }">
+        <h6 class="font-medium text-lg text-center mt-1">Nhập ngày tháng năm cần tìm</h6>
+        <form [formGroup]="searchForm">
+          <div class="flex justify-between items-center w-fit my-2">
+            <input
+            (focus)="onFocus('day')"
+            [ngClass]="isInvalid('day') ? 'border-red-500' : 'border-gray-500'"
+            type="text" formControlName="day" class="in-search border" inputMode="numeric" placeholder="Ngày">
+            <input
+            (focus)="onFocus('month')"
+            [ngClass]="isInvalid('month') ? 'border-red-500' : 'border-gray-500'"
+            type="text" formControlName="month"  class="in-search border" inputMode="numeric" placeholder="Tháng">
+            <input
+            (focus)="onFocus('year')"
+            [ngClass]="isInvalid('year') ? 'border-red-500' : 'border-gray-500'"
+            type="text" formControlName="year" class="in-search border" inputMode="numeric" placeholder="Năm">
+          </div>
+          <div class="flex justify-between items-center mb-2">
+            <button
+            (click)="onSearchSolar()"
+            [ngClass]="{'cursor-not-allowed bg-opacity-50':searchForm.invalid}"
+            class="px-1 py-1.5 rounded-md bg-blue-500 text-white">Lịch Dương</button>
+            <p><i class="fa-solid fa-left-long"></i> Tìm Theo <i class="fa-solid fa-right-long"></i></p>
+            <button
+            (click)="onSearchLunar()"
+            [ngClass]="{'cursor-not-allowed bg-opacity-50':searchForm.invalid}"
+            class="px-1 py-1.5 rounded-md bg-red-500  text-white">Lịch Âm</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
 
 <!-- Ngày trong tuần -->
 <div class="grid grid-cols-7 text-center mb-2">

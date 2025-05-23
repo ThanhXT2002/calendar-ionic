@@ -44,6 +44,7 @@ export class Tab1Page implements OnInit {
   loadingLunar: boolean = false;
   isSpeakingSolar = false;
   isSpeakingLunar = false;
+  isIOS = isPlatform('ios');
 
   constructor(
     private calendarService: CalendarService,
@@ -351,19 +352,10 @@ export class Tab1Page implements OnInit {
   }
 
   getMarginTopClass(): string {
-    const userAgent = navigator.userAgent.toLowerCase();
-
-    // Nếu là Android trình duyệt (không phải app Ionic/Capacitor)
-    if (
-      userAgent.includes('android') &&
-      !userAgent.includes('wv') &&
-      !userAgent.includes('cordova') &&
-      !userAgent.includes('capacitor')
-    ) {
-      return 'mt-14';
+    if (this.isIOS) {
+      return 'mt-11';
     }
 
-    // Mặc định: app (Ionic app build native hoặc webview)
-    return 'mt-10';
+    return 'mt-14';
   }
 }
