@@ -72,10 +72,6 @@ export class ExtendedDayInfoComponent implements OnInit, OnChanges {
     }
   }
 
-  getGoodHoursCount(): number {
-    return this.goodHours.filter((hour) => hour.isGoodHour).length;
-  }
-
   onImageError(event: any) {
     event.target.src = 'assets/images/chi/default.webp';
   }

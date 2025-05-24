@@ -22,11 +22,9 @@ export interface ISolarTerm {
 export interface IGoodHour {
   gioChi: string;
   khungGio: string;
-  thanHoangDao: string;
   isGoodHour: boolean;
   imagePath?: string;
-  chiImage: string; 
-  chiName: string;
+  chiImage: string;
 }
 
 export interface IDayQuality {
