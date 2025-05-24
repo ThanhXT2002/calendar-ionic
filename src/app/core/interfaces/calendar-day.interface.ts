@@ -20,12 +20,13 @@ export interface ISolarTerm {
 }
 
 export interface IGoodHour {
-  name: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  isGood: boolean;
-  suitableFor: string[];
+  gioChi: string;
+  khungGio: string;
+  thanHoangDao: string;
+  isGoodHour: boolean;
+  imagePath?: string;
+  chiImage: string; 
+  chiName: string;
 }
 
 export interface IDayQuality {

@@ -1,123 +1,240 @@
 <!-- extended-day-info.component.html -->
-<div class="extended-day-info ">
-
+<div class="extended-day-info">
   <!-- Can Chi và thông tin cơ bản -->
 
- <div class="p-2">
-  <div class=" bg-purple-200 rounded-lg  py-3 text-center">
-    <i class="fa-solid fa-yin-yang mr-2 text-2xl mb-2"></i>
-    <h2 class="text-lg">Ngày <strong>{{dayCanChi}} </strong> Tháng <strong>{{monthCanChi}}</strong> Năm <strong>{{yearCanChi}}</strong></h2>
-  </div>
- </div>
+  <div class="p-2">
+    <div class="bg-purple-200 rounded-xl py-3 text-center mb-5">
+      <i class="fa-solid fa-yin-yang mr-2 text-2xl mb-2"></i>
+      <h2 class="text-lg">
+        Ngày <strong>{{ dayCanChi }} </strong> Tháng
+        <strong>{{ monthCanChi }}</strong> Năm <strong>{{ yearCanChi }}</strong>
+      </h2>
+    </div>
 
-   <!-- Giờ hoàng đạo
-   <ion-card *ngIf="goodHours.length > 0">
+    <div
+      class="p-6 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 rounded-xl shadow-2xl border border-yellow-500/20 relative overflow-hidden"
+    >
+      <!-- Starry background effect -->
+      <div class="absolute inset-0 opacity-30">
+        <div
+          class="absolute top-4 left-8 w-1 h-1 bg-yellow-300 rounded-full animate-ping"
+        ></div>
+        <div
+          class="absolute top-12 right-12 w-1.5 h-1.5 bg-yellow-200 rounded-full animate-pulse"
+        ></div>
+        <div
+          class="absolute bottom-16 left-16 w-0.5 h-0.5 bg-yellow-100 rounded-full animate-ping"
+        ></div>
+        <div
+          class="absolute bottom-8 right-8 w-1 h-1 bg-yellow-400 rounded-full animate-pulse"
+        ></div>
+        <div
+          class="absolute top-20 left-1/3 w-0.5 h-0.5 bg-yellow-200 rounded-full animate-ping"
+        ></div>
+        <div
+          class="absolute bottom-24 right-1/4 w-1 h-1 bg-yellow-300 rounded-full animate-pulse"
+        ></div>
+      </div>
+
+      <div class="text-center mb-8 relative z-10">
+        <!-- Moon icon with glow -->
+        <div
+          class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-500 rounded-full mb-4 shadow-2xl relative"
+        >
+          <div
+            class="absolute inset-0 bg-yellow-400/30 rounded-full animate-pulse scale-110"
+          ></div>
+          <i class="fa-solid fa-moon text-slate-900 text-3xl relative z-10"></i>
+        </div>
+
+        <h3
+          class="text-3xl font-bold text-transparent bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-300 bg-clip-text mb-2"
+        >
+          Giờ Hoàng Đạo
+        </h3>
+
+
+        <div
+          class="inline-flex items-center space-x-2 bg-yellow-500/10 backdrop-blur-sm border border-yellow-400/30 rounded-full px-4 py-2 text-sm text-yellow-200"
+        >
+          <i class="fa-solid fa-star text-yellow-400 animate-pulse"></i>
+          <span class="font-medium"
+            >{{ getGoodHoursCount() }} giờ tốt trong đêm ngày</span
+          >
+        </div>
+      </div>
+
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 relative z-10"
+      >
+        @for (hour of goodHours; track hour.gioChi) { @if (hour.isGoodHour) {
+        <div
+          class="group relative bg-gradient-to-br from-slate-800/60 to-blue-900/40 backdrop-blur-sm rounded-2xl p-5 shadow-xl border border-yellow-500/20 hover:border-yellow-400/40 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-yellow-500/10"
+        >
+          <!-- Constellation effect -->
+          <div
+            class="absolute top-3 right-3 w-2 h-2 bg-yellow-400 rounded-full animate-pulse opacity-60"
+          ></div>
+          <div
+            class="absolute top-5 right-6 w-1 h-1 bg-yellow-300 rounded-full animate-ping opacity-40"
+          ></div>
+
+          <!-- Glow border effect -->
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-yellow-500/0 via-yellow-500/10 to-yellow-500/0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          ></div>
+
+          <div class="flex items-center justify-between space-x-4 relative z-10">
+            <!-- Hình ảnh con vật trong moon circle -->
+            <div class="flex-shrink-0">
+              <div
+                class="w-18 h-18 bg-gradient-to-br from-yellow-400/20 to-amber-500/20 rounded-full p-2 shadow-lg border-2 border-yellow-500 relative"
+              >
+                <div
+                  class="absolute inset-0 bg-yellow-400/10 rounded-full animate-pulse"
+                ></div>
+                <img
+                  [src]="hour.chiImage"
+                  [alt]="hour.chiName"
+                  class="w-14 h-full object-contain group-hover:scale-110 transition-transform duration-500 filter brightness-110 relative z-10 rounded-full"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+
+            <!-- Thông tin chi và giờ -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center space-x-3 mb-2">
+                <h4
+                  class="text-xl font-bold text-yellow-300 group-hover:text-yellow-200 transition-colors duration-300"
+                >
+                  {{ hour.gioChi }}
+                </h4>
+                <span
+                  class="text-xs bg-yellow-500/20 text-yellow-200 px-3 py-1 rounded-full font-medium border border-yellow-500/30 whitespace-nowrap"
+                >
+                {{ hour.thanHoangDao }}
+                </span>
+              </div>
+
+              <div class="space-y-2">
+                <p
+                  class="text-sm font-semibold text-yellow-100/90 flex items-center"
+                >
+                  <i
+                    class="fa-regular fa-clock text-yellow-400 mr-2 text-sm"
+                  ></i>
+                  {{ hour.khungGio }}
+                </p>
+
+
+              </div>
+            </div>
+
+
+          </div>
+
+          <!-- Bottom accent line -->
+          <div
+            class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent"
+          ></div>
+        </div>
+        } }
+      </div>
+
+      <!-- Mystical footer -->
+      <div class="mt-8 text-center relative z-10">
+        <div
+          class="inline-flex items-center space-x-2 text-yellow-200/60 text-xs"
+        >
+          <i class="fa-solid fa-moon text-yellow-400 animate-pulse"></i>
+          <span class="font-medium">Được tính toán theo âm lịch cổ truyền</span>
+          <i class="fa-solid fa-star text-yellow-400 animate-pulse"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chất lượng ngày -->
+  <ion-card *ngIf="dayQuality" class="bg-white rounded-xl border-2 border-yellow-400">
     <ion-card-header>
-      <ion-card-title class="text-lg">
-        <i class="fa-solid fa-clock mr-2"></i>
-        Giờ hoàng đạo ({{ goodHours.length }} giờ)
+      <ion-card-title class="text-lg font-semibold">
+        <i class="fa-solid fa-calendar-check mr-2"></i>
+        Chất lượng ngày
       </ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-list lines="none">
-        <ion-item *ngFor="let hour of goodHours" class="mb-2">
-          <div class="w-full">
-            <div class="flex justify-between items-start mb-1">
-              <h4 class="font-semibold text-blue-700">{{ hour.name }}</h4>
-              <span class="text-sm font-medium text-gray-600">
-                {{ hour.startTime }} - {{ hour.endTime }}
-              </span>
-            </div>
-
-            <p class="text-sm text-gray-600 mb-2">{{ hour.description }}</p>
-
-            <div *ngIf="hour.suitableFor.length > 0" class="flex flex-wrap gap-1">
-              <ion-chip *ngFor="let activity of hour.suitableFor"
-                        color="primary"
-                        size="small">
-                {{ activity }}
-              </ion-chip>
-            </div>
-          </div>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card> -->
-
-
-  <!-- Chất lượng ngày -->
-<!-- Chất lượng ngày -->
-<ion-card *ngIf="dayQuality">
-  <ion-card-header>
-    <ion-card-title class="text-lg">
-      <i class="fa-solid fa-calendar-check mr-2"></i>
-      Chất lượng ngày
-    </ion-card-title>
-  </ion-card-header>
-  <ion-card-content>
-
-    <!-- Hoàng đạo / Hắc đạo -->
-    <div class="text-center mb-4">
-      <div class="flex items-center justify-center mb-2">
-        <ion-icon
-          [name]="getQualityIcon(dayQuality.quality)"
-          [color]="getQualityColor(dayQuality.quality)"
-          class="text-2xl mr-2">
-        </ion-icon>
-        <span class="text-xl font-bold"
-              [ngClass]="dayQuality.isGoodDay ? 'text-green-600' : 'text-red-600'">
-          {{ dayQuality.quality.toUpperCase() }}
-        </span>
+      <!-- Hoàng đạo / Hắc đạo -->
+      <div class="text-center mb-4">
+        <div class="flex items-center justify-center mb-2">
+          <ion-icon
+            [name]="getQualityIcon(dayQuality.quality)"
+            [color]="getQualityColor(dayQuality.quality)"
+            class="text-2xl mr-2"
+          >
+          </ion-icon>
+          <span
+            class="text-xl font-bold"
+            [ngClass]="dayQuality.isGoodDay ? 'text-green-600' : 'text-red-600'"
+          >
+            {{ dayQuality.quality.toUpperCase() }}
+          </span>
+        </div>
       </div>
+
+        <!-- Suitable Activities -->
+  <div *ngIf="dayQuality.suitableFor.length > 0" class="bg-green-100 rounded-lg border border-gray-200 p-4">
+    <div class="flex items-center space-x-2 mb-3">
+      <div class="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+        <i class="fa-solid fa-check text-white text-xs"></i>
+      </div>
+      <h5 class="font-medium text-gray-900">Nên làm</h5>
     </div>
-
-    <!-- Nên làm -->
-<div *ngIf="dayQuality.suitableFor.length > 0" class="mb-3">
-  <h5 class="font-semibold text-green-700 mb-2">
-    <i class="fa-solid fa-check-circle mr-1"></i>
-    Nên làm:
-  </h5>
-  <div class="flex flex-wrap">
-    <span *ngFor="let item of dayQuality.suitableFor"
-          class="relative bg-green-600 text-white text-sm font-medium px-3 py-1 rounded-xl shadow mr-2 mb-2 before:content-[''] before:absolute before:top-1/2 before:left-0 before:-ml-2 before:-translate-y-1/2 before:border-[6px] before:border-solid before:border-r-green-600 before:border-t-transparent before:border-b-transparent before:border-l-transparent">
-      {{ item }}
-    </span>
+    <div class="flex flex-wrap gap-2">
+      <span
+        *ngFor="let item of dayQuality.suitableFor"
+        class="inline-block bg-green-50 text-green-700 text-sm px-3 py-1 rounded-full border border-green-200"
+      >
+        {{ item }}
+      </span>
+    </div>
   </div>
-</div>
 
-<!-- Nên tránh -->
-<div *ngIf="dayQuality.avoidFor.length > 0" class="mb-3">
-  <h5 class="font-semibold text-red-700 mb-2">
-    <i class="fa-solid fa-times-circle mr-1"></i>
-    Nên tránh:
-  </h5>
-  <div class="flex flex-wrap">
-    <span *ngFor="let item of dayQuality.avoidFor"
-          class="relative bg-red-600 text-white text-sm font-medium px-3 py-1 rounded-xl shadow mr-2 mb-2 before:content-[''] before:absolute before:top-1/2 before:left-0 before:-ml-2 before:-translate-y-1/2 before:border-[6px] before:border-solid before:border-r-red-600 before:border-t-transparent before:border-b-transparent before:border-l-transparent">
-      {{ item }}
-    </span>
+  <!-- Activities to Avoid -->
+  <div *ngIf="dayQuality.avoidFor.length > 0" class="bg-red-100 mt-2 rounded-lg border border-gray-200 p-4">
+    <div class="flex items-center space-x-2 mb-3">
+      <div class="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+        <i class="fa-solid fa-times text-white text-xs"></i>
+      </div>
+      <h5 class="font-medium text-gray-900">Nên tránh</h5>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <span
+        *ngFor="let item of dayQuality.avoidFor"
+        class="inline-block bg-red-50 text-red-700 text-sm px-3 py-1 rounded-full border border-red-200"
+      >
+        {{ item }}
+      </span>
+    </div>
   </div>
-</div>
 
-<!-- Tuổi xung khắc -->
-<div *ngIf="dayQuality.conflictAges.length > 0">
-  <h5 class="font-semibold text-orange-700 mb-2">
-    <i class="fa-solid fa-exclamation-triangle mr-1"></i>
-    Tuổi xung khắc:
-  </h5>
-  <div class="flex flex-wrap">
-    <span *ngFor="let age of dayQuality.conflictAges"
-          class="relative bg-orange-600 text-white text-sm font-medium px-3 py-1 rounded-xl shadow mr-2 mb-2 before:content-[''] before:absolute before:top-1/2 before:left-0 before:-ml-2 before:-translate-y-1/2 before:border-[6px] before:border-solid before:border-r-orange-600 before:border-t-transparent before:border-b-transparent before:border-l-transparent">
-      {{ age }}
-    </span>
+  <!-- Conflicting Ages -->
+  <div *ngIf="dayQuality.conflictAges.length > 0" class="bg-orange-50 mt-2 rounded-lg border border-gray-200 p-4">
+    <div class="flex items-center space-x-2 mb-3">
+      <div class="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+        <i class="fa-solid fa-exclamation text-white text-xs"></i>
+      </div>
+      <h5 class="font-medium text-gray-900">Tuổi xung khắc</h5>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <span
+        *ngFor="let age of dayQuality.conflictAges"
+        class="inline-block bg-orange-50 text-orange-700 text-sm px-3 py-1 rounded-full border border-orange-200"
+      >
+        {{ age }}
+      </span>
+    </div>
   </div>
-</div>
-
-
-  </ion-card-content>
-</ion-card>
-
-
-
-
+    </ion-card-content>
+  </ion-card>
 </div>

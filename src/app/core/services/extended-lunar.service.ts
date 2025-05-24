@@ -8,32 +8,49 @@ import { IDayQuality, IGoodHour, ISolarTerm } from 'src/app/core/interfaces/cale
   providedIn: 'root',
 })
 export class ExtendedLunarService {
-
   // 24 tiết khí theo thứ tự
   private readonly SOLAR_TERMS = [
-    'Lập xuân', 'Vũ thủy', 'Kinh trập', 'Xuân phân',
-    'Thanh minh', 'Cốc vũ', 'Lập hạ', 'Tiểu mãn',
-    'Mang chủng', 'Hạ chí', 'Tiểu thử', 'Đại thử',
-    'Lập thu', 'Xử thử', 'Bạch lộ', 'Thu phân',
-    'Hàn lộ', 'Sương giáng', 'Lập đông', 'Tiểu tuyết',
-    'Đại tuyết', 'Đông chí', 'Tiểu hàn', 'Đại hàn'
+    'Lập xuân',
+    'Vũ thủy',
+    'Kinh trập',
+    'Xuân phân',
+    'Thanh minh',
+    'Cốc vũ',
+    'Lập hạ',
+    'Tiểu mãn',
+    'Mang chủng',
+    'Hạ chí',
+    'Tiểu thử',
+    'Đại thử',
+    'Lập thu',
+    'Xử thử',
+    'Bạch lộ',
+    'Thu phân',
+    'Hàn lộ',
+    'Sương giáng',
+    'Lập đông',
+    'Tiểu tuyết',
+    'Đại tuyết',
+    'Đông chí',
+    'Tiểu hàn',
+    'Đại hàn',
   ];
 
   // 12 trực (Kiến trừ thập nhị khách)
   private readonly TRUC_NAMES = [
-    'Kiến', 'Trừ', 'Mãn', 'Bình', 'Định', 'Chấp',
-    'Phá', 'Nguy', 'Thành', 'Thu', 'Khai', 'Bế'
+    'Kiến',
+    'Trừ',
+    'Mãn',
+    'Bình',
+    'Định',
+    'Chấp',
+    'Phá',
+    'Nguy',
+    'Thành',
+    'Thu',
+    'Khai',
+    'Bế',
   ];
-
-  // 12 giờ hoàng đạo theo Can Chi
-  private readonly GOOD_HOURS_MAP: { [key: string]: IGoodHour[] } = {
-    'Giáp': [
-      { name: 'Thanh Long', description: 'Sao Thiên Ất tinh', startTime: '07:00', endTime: '09:00', isGood: true, suitableFor: ['cưới hỏi', 'khai trương', 'thi cử'] },
-      { name: 'Minh Đường', description: 'Sao Quý Nhân tinh', startTime: '09:00', endTime: '11:00', isGood: true, suitableFor: ['động thổ', 'nhậm chức'] },
-      // ... thêm các giờ khác
-    ],
-    // ... thêm các can khác
-  };
 
   constructor(private lunarCalendarService: LunarCalendarService) {}
 
@@ -51,7 +68,7 @@ export class ExtendedLunarService {
       terms.push({
         name: this.SOLAR_TERMS[i],
         date: termDate,
-        type: i % 2 === 0 ? 'tiết' : 'khí'
+        type: i % 2 === 0 ? 'tiết' : 'khí',
       });
     }
 
@@ -98,43 +115,136 @@ export class ExtendedLunarService {
 
   // ==================== GIỜ HOÀNG ĐẠO ====================
 
-  /**
-   * Lấy giờ hoàng đạo của ngày
-   */
-  getGoodHours(date: Date): IGoodHour[] {
-    const canChi = this.lunarCalendarService.getDayCanChi(date);
-    const can = canChi.split(' ')[0]; // Lấy Can
-
-    // Tính giờ hoàng đạo dựa trên Can của ngày
-    return this.calculateGoodHoursForCan(can);
+  getGoodHoursOfDay(dayChi: string): IGoodHour[] {
+    const goodHours = this.goodHoursByDayChi[dayChi] ?? [];
+    return this.allHoursInDay.map((hour) => ({
+      ...hour,
+      isGoodHour: goodHours.includes(hour.gioChi),
+    }));
   }
 
-  private calculateGoodHoursForCan(can: string): IGoodHour[] {
-    // Công thức tính giờ hoàng đạo dựa trên Can của ngày
-    const goodHours: IGoodHour[] = [];
-
-    // Mỗi Can có quy luật riêng về giờ hoàng đạo
-    const hourMapping = this.getHourMappingForCan(can);
-
-    hourMapping.forEach(hour => {
-      goodHours.push(hour);
-    });
-
-    return goodHours;
+  getGoodHoursFromCanChi(canChi: string): IGoodHour[] {
+    const parts = canChi.trim().split(' ');
+    const chi = parts.length === 2 ? parts[1] : '';
+    return this.getGoodHoursOfDay(chi);
   }
 
-  private getHourMappingForCan(can: string): IGoodHour[] {
-    // Đây là một phiên bản đơn giản, thực tế cần tra cứu bảng chính xác
-    const baseHours: IGoodHour[] = [
-      { name: 'Thanh Long', description: 'Sao Thiên Ất tinh', startTime: '07:00', endTime: '09:00', isGood: true, suitableFor: ['cưới hỏi', 'khai trương'] },
-      { name: 'Minh Đường', description: 'Sao Quý Nhân tinh', startTime: '09:00', endTime: '11:00', isGood: true, suitableFor: ['động thổ', 'nhậm chức'] },
-      { name: 'Kim Đường', description: 'Sao Địa Tài tinh', startTime: '15:00', endTime: '17:00', isGood: true, suitableFor: ['khởi công', 'khai trương'] },
-      { name: 'Ngọc Đường', description: 'Sao Thiếu Vi tinh', startTime: '17:00', endTime: '19:00', isGood: true, suitableFor: ['thi cử', 'nhậm chức'] },
-      { name: 'Tư Mệnh', description: 'Sao Phượng Liễn tinh', startTime: '21:00', endTime: '23:00', isGood: true, suitableFor: ['ký kết hợp đồng'] },
-    ];
+  private chiAnimalMapping: Record<string, { name: string; image: string }> = {
+    Tý: { name: 'Chuột', image: 'assets/images/chi/chuot.webp' },
+    Sửu: { name: 'Trâu', image: 'assets/images/chi/trau.webp' },
+    Dần: { name: 'Hổ', image: 'assets/images/chi/ho.webp' },
+    Mão: { name: 'Mèo', image: 'assets/images/chi/meo.webp' },
+    Thìn: { name: 'Rồng', image: 'assets/images/chi/rong.webp' },
+    Tỵ: { name: 'Rắn', image: 'assets/images/chi/ran.webp' },
+    Ngọ: { name: 'Ngựa', image: 'assets/images/chi/ngua.webp' },
+    Mùi: { name: 'Dê', image: 'assets/images/chi/de.webp' },
+    Thân: { name: 'Khỉ', image: 'assets/images/chi/khi.webp' },
+    Dậu: { name: 'Gà', image: 'assets/images/chi/ga.webp' },
+    Tuất: { name: 'Chó', image: 'assets/images/chi/cho.webp' },
+    Hợi: { name: 'Lợn', image: 'assets/images/chi/lon.webp' },
+  };
 
-    return baseHours;
-  }
+  private goodHoursByDayChi: Record<string, string[]> = {
+    Tý: ['Tý', 'Sửu', 'Mão', 'Ngọ', 'Thân', 'Dậu'],
+    Sửu: ['Dần', 'Mão', 'Tỵ', 'Thân', 'Tuất', 'Hợi'],
+    Dần: ['Tý', 'Dần', 'Mão', 'Ngọ', 'Mùi', 'Dậu'],
+    Mão: ['Tý', 'Sửu', 'Thìn', 'Tỵ', 'Mùi', 'Tuất'],
+    Thìn: ['Tý', 'Dần', 'Mão', 'Ngọ', 'Thân', 'Tuất'],
+    Tỵ: ['Tý', 'Sửu', 'Mão', 'Ngọ', 'Thân', 'Dậu'],
+    Ngọ: ['Dần', 'Mão', 'Tỵ', 'Thân', 'Tuất', 'Hợi'],
+    Mùi: ['Tý', 'Dần', 'Mão', 'Ngọ', 'Mùi', 'Dậu'],
+    Thân: ['Tý', 'Sửu', 'Thìn', 'Tỵ', 'Mùi', 'Tuất'],
+    Dậu: ['Tý', 'Dần', 'Mão', 'Ngọ', 'Thân', 'Tuất'],
+    Tuất: ['Tý', 'Sửu', 'Mão', 'Ngọ', 'Thân', 'Dậu'],
+    Hợi: ['Dần', 'Mão', 'Tỵ', 'Thân', 'Tuất', 'Hợi'],
+  };
+
+  private allHoursInDay: Omit<IGoodHour, 'isGoodHour'>[] = [
+    {
+      gioChi: 'Tý',
+      khungGio: '23:00 – 01:00',
+      thanHoangDao: 'Tư Mệnh',
+      chiImage: this.chiAnimalMapping['Tý'].image,
+      chiName: this.chiAnimalMapping['Tý'].name,
+    },
+    {
+      gioChi: 'Sửu',
+      khungGio: '01:00 – 03:00',
+      thanHoangDao: 'Thanh Long',
+      chiImage: this.chiAnimalMapping['Sửu'].image,
+      chiName: this.chiAnimalMapping['Sửu'].name,
+    },
+    {
+      gioChi: 'Dần',
+      khungGio: '03:00 – 05:00',
+      thanHoangDao: 'Minh Đường',
+      chiImage: this.chiAnimalMapping['Dần'].image,
+      chiName: this.chiAnimalMapping['Dần'].name,
+    },
+    {
+      gioChi: 'Mão',
+      khungGio: '05:00 – 07:00',
+      thanHoangDao: 'Kim Quỹ',
+      chiImage: this.chiAnimalMapping['Mão'].image,
+      chiName: this.chiAnimalMapping['Mão'].name,
+    },
+    {
+      gioChi: 'Thìn',
+      khungGio: '07:00 – 09:00',
+      thanHoangDao: 'Thiên Đức',
+      chiImage: this.chiAnimalMapping['Thìn'].image,
+      chiName: this.chiAnimalMapping['Thìn'].name,
+    },
+    {
+      gioChi: 'Tỵ',
+      khungGio: '09:00 – 11:00',
+      thanHoangDao: 'Ngọc Đường',
+      chiImage: this.chiAnimalMapping['Tỵ'].image,
+      chiName: this.chiAnimalMapping['Tỵ'].name,
+    },
+    {
+      gioChi: 'Ngọ',
+      khungGio: '11:00 – 13:00',
+      thanHoangDao: 'Tư Mệnh',
+      chiImage: this.chiAnimalMapping['Ngọ'].image,
+      chiName: this.chiAnimalMapping['Ngọ'].name,
+    },
+    {
+      gioChi: 'Mùi',
+      khungGio: '13:00 – 15:00',
+      thanHoangDao: 'Thanh Long',
+      chiImage: this.chiAnimalMapping['Mùi'].image,
+      chiName: this.chiAnimalMapping['Mùi'].name,
+    },
+    {
+      gioChi: 'Thân',
+      khungGio: '15:00 – 17:00',
+      thanHoangDao: 'Minh Đường',
+      chiImage: this.chiAnimalMapping['Thân'].image,
+      chiName: this.chiAnimalMapping['Thân'].name,
+    },
+    {
+      gioChi: 'Dậu',
+      khungGio: '17:00 – 19:00',
+      thanHoangDao: 'Kim Quỹ',
+      chiImage: this.chiAnimalMapping['Dậu'].image,
+      chiName: this.chiAnimalMapping['Dậu'].name,
+    },
+    {
+      gioChi: 'Tuất',
+      khungGio: '19:00 – 21:00',
+      thanHoangDao: 'Thiên Đức',
+      chiImage: this.chiAnimalMapping['Tuất'].image,
+      chiName: this.chiAnimalMapping['Tuất'].name,
+    },
+    {
+      gioChi: 'Hợi',
+      khungGio: '21:00 – 23:00',
+      thanHoangDao: 'Ngọc Đường',
+      chiImage: this.chiAnimalMapping['Hợi'].image,
+      chiName: this.chiAnimalMapping['Hợi'].name,
+    },
+  ];
 
   // ==================== NGÀY TỐT XẤU ====================
 
@@ -159,7 +269,7 @@ export class ExtendedLunarService {
       trucDescription: trucInfo.description,
       suitableFor: trucInfo.suitableFor,
       avoidFor: trucInfo.avoidFor,
-      conflictAges: this.getConflictAges(canChi)
+      conflictAges: this.getConflictAges(canChi),
     };
   }
 
@@ -175,71 +285,77 @@ export class ExtendedLunarService {
   /**
    * Lấy thông tin về trực
    */
-  private getTrucInfo(truc: string): { description: string; suitableFor: string[]; avoidFor: string[] } {
+  private getTrucInfo(truc: string): {
+    description: string;
+    suitableFor: string[];
+    avoidFor: string[];
+  } {
     const trucInfoMap: { [key: string]: any } = {
-      'Kiến': {
+      Kiến: {
         description: 'Tốt cho khởi công, xây dựng, khai trương',
         suitableFor: ['động thổ', 'khai trương', 'khởi công'],
-        avoidFor: ['tang lễ', 'chôn cất']
+        avoidFor: ['tang lễ', 'chôn cất'],
       },
-      'Trừ': {
+      Trừ: {
         description: 'Tốt cho dọn dẹp, tẩy rửa, trừ bệnh',
         suitableFor: ['dọn dẹp', 'tẩy rửa'],
-        avoidFor: ['cưới hỏi', 'khai trương']
+        avoidFor: ['cưới hỏi', 'khai trương'],
       },
-      'Mãn': {
+      Mãn: {
         description: 'Tốt cho cưới hỏi, khai trương',
         suitableFor: ['cưới hỏi', 'lễ tế'],
-        avoidFor: ['xuất hành', 'động thổ']
+        avoidFor: ['xuất hành', 'động thổ'],
       },
-      'Bình': {
+      Bình: {
         description: 'Ngày bình thường, tốt cho mọi việc',
         suitableFor: ['mọi việc'],
-        avoidFor: []
+        avoidFor: [],
       },
-      'Định': {
+      Định: {
         description: 'Tốt cho ký kết, nhậm chức',
         suitableFor: ['ký kết', 'nhậm chức'],
-        avoidFor: ['xuất hành', 'di chuyển']
+        avoidFor: ['xuất hành', 'di chuyển'],
       },
-      'Chấp': {
+      Chấp: {
         description: 'Tốt cho học tập, sửa chữa',
         suitableFor: ['học tập', 'sửa chữa'],
-        avoidFor: ['cưới hỏi']
+        avoidFor: ['cưới hỏi'],
       },
-      'Phá': {
+      Phá: {
         description: 'Tốt cho phá dỡ, dọn dẹp',
         suitableFor: ['phá dỡ', 'dọn dẹp'],
-        avoidFor: ['cưới hỏi', 'khai trương', 'động thổ']
+        avoidFor: ['cưới hỏi', 'khai trương', 'động thổ'],
       },
-      'Nguy': {
+      Nguy: {
         description: 'Ngày xấu, nên tránh mọi việc quan trọng',
         suitableFor: [],
-        avoidFor: ['mọi việc quan trọng']
+        avoidFor: ['mọi việc quan trọng'],
       },
-      'Thành': {
+      Thành: {
         description: 'Tốt cho hoàn thành, kết thúc',
         suitableFor: ['hoàn thành công việc', 'ký kết'],
-        avoidFor: ['khởi đầu']
+        avoidFor: ['khởi đầu'],
       },
-      'Thu': {
+      Thu: {
         description: 'Tốt cho thu hoạch, tích trữ',
         suitableFor: ['thu hoạch', 'tích trữ'],
-        avoidFor: ['xuất hành']
+        avoidFor: ['xuất hành'],
       },
-      'Khai': {
+      Khai: {
         description: 'Tốt cho khởi đầu, khai trương',
         suitableFor: ['khai trương', 'khởi đầu'],
-        avoidFor: ['chôn cất']
+        avoidFor: ['chôn cất'],
       },
-      'Bế': {
+      Bế: {
         description: 'Ngày xấu, chỉ tốt cho đắp đê, lấp hố',
         suitableFor: ['đắp đê', 'lấp hố'],
-        avoidFor: ['mọi việc khác']
-      }
+        avoidFor: ['mọi việc khác'],
+      },
     };
 
-    return trucInfoMap[truc] || { description: '', suitableFor: [], avoidFor: [] };
+    return (
+      trucInfoMap[truc] || { description: '', suitableFor: [], avoidFor: [] }
+    );
   }
 
   /**
@@ -260,18 +376,18 @@ export class ExtendedLunarService {
 
     // Xung khắc dựa trên Chi
     const conflictMap: { [key: string]: string[] } = {
-      'Tý': ['Ngọ'],
-      'Sửu': ['Mùi'],
-      'Dần': ['Thân'],
-      'Mão': ['Dậu'],
-      'Thìn': ['Tuất'],
-      'Tỵ': ['Hợi'],
-      'Ngọ': ['Tý'],
-      'Mùi': ['Sửu'],
-      'Thân': ['Dần'],
-      'Dậu': ['Mão'],
-      'Tuất': ['Thìn'],
-      'Hợi': ['Tỵ']
+      Tý: ['Ngọ'],
+      Sửu: ['Mùi'],
+      Dần: ['Thân'],
+      Mão: ['Dậu'],
+      Thìn: ['Tuất'],
+      Tỵ: ['Hợi'],
+      Ngọ: ['Tý'],
+      Mùi: ['Sửu'],
+      Thân: ['Dần'],
+      Dậu: ['Mão'],
+      Tuất: ['Thìn'],
+      Hợi: ['Tỵ'],
     };
 
     return conflictMap[chi] || [];
@@ -286,28 +402,9 @@ export class ExtendedLunarService {
     const year = date.getFullYear();
     const terms = this.getSolarTermsInYear(year);
 
-    return terms.find(term =>
-      term.date.toDateString() === date.toDateString()
-    ) || null;
-  }
-
-  /**
-   * Lấy giờ tốt nhất trong ngày
-   */
-  getBestHourOfDay(date: Date): IGoodHour | null {
-    const goodHours = this.getGoodHours(date);
-    const now = new Date();
-
-    // Nếu là ngày hiện tại, chỉ lấy giờ chưa qua
-    if (date.toDateString() === now.toDateString()) {
-      const currentHour = now.getHours();
-      return goodHours.find(hour => {
-        const startHour = parseInt(hour.startTime.split(':')[0]);
-        return startHour > currentHour;
-      }) || null;
-    }
-
-    // Nếu là ngày khác, lấy giờ đầu tiên
-    return goodHours[0] || null;
+    return (
+      terms.find((term) => term.date.toDateString() === date.toDateString()) ||
+      null
+    );
   }
 }

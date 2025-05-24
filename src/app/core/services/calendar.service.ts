@@ -4,7 +4,7 @@ import { LunarCalendarService } from './lunar-calendar.service';
 import { ICalendarDay } from '../interfaces/calendar-day.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CalendarService {
   private today = new Date();
@@ -75,7 +75,7 @@ export class CalendarService {
         lunarYear: lunar.year,
         isToday: this.isSameDay(date, this.today),
         isSelected: this.isSameDay(date, selectedDate),
-        isCurrentMonth: false
+        isCurrentMonth: false,
       });
     }
 
@@ -93,7 +93,7 @@ export class CalendarService {
         lunarYear: lunar.year,
         isToday: this.isSameDay(date, this.today),
         isSelected: this.isSameDay(date, selectedDate),
-        isCurrentMonth: true
+        isCurrentMonth: true,
       });
     }
 
@@ -112,7 +112,7 @@ export class CalendarService {
         lunarYear: lunar.year,
         isToday: this.isSameDay(date, this.today),
         isSelected: this.isSameDay(date, selectedDate),
-        isCurrentMonth: false
+        isCurrentMonth: false,
       });
     }
 
@@ -121,12 +121,27 @@ export class CalendarService {
 
   // ==================== LUNAR CALENDAR CONVERSIONS ====================
 
-  solarToLunar(date: Date): { day: number; month: number; year: number; leap: boolean } {
+  solarToLunar(date: Date): {
+    day: number;
+    month: number;
+    year: number;
+    leap: boolean;
+  } {
     return this.lunarCalendarService.solarToLunar(date);
   }
 
-  lunarToSolar(day: number, month: number, year: number, isLeapMonth: boolean = false): Date | null {
-    return this.lunarCalendarService.lunarToSolar(day, month, year, isLeapMonth);
+  lunarToSolar(
+    day: number,
+    month: number,
+    year: number,
+    isLeapMonth: boolean = false
+  ): Date | null {
+    return this.lunarCalendarService.lunarToSolar(
+      day,
+      month,
+      year,
+      isLeapMonth
+    );
   }
 
   // ==================== VALIDATIONS ====================
@@ -140,27 +155,47 @@ export class CalendarService {
   }
 
   isSameDay(date1: Date, date2: Date): boolean {
-    return date1.getDate() === date2.getDate() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getFullYear() === date2.getFullYear();
+    return (
+      date1.getDate() === date2.getDate() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear()
+    );
   }
 
   // ==================== DISPLAY NAMES ====================
 
   getMonthName(month: number): string {
     const monthNames = [
-      'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4',
-      'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8',
-      'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+      'Tháng 1',
+      'Tháng 2',
+      'Tháng 3',
+      'Tháng 4',
+      'Tháng 5',
+      'Tháng 6',
+      'Tháng 7',
+      'Tháng 8',
+      'Tháng 9',
+      'Tháng 10',
+      'Tháng 11',
+      'Tháng 12',
     ];
     return monthNames[month];
   }
 
   getLunarMonthName(month: number): string {
     const monthNames = [
-      'Tháng Giêng', 'Tháng Hai', 'Tháng Ba', 'Tháng Tư',
-      'Tháng Năm', 'Tháng Sáu', 'Tháng Bảy', 'Tháng Tám',
-      'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Chạp'
+      'Tháng Giêng',
+      'Tháng Hai',
+      'Tháng Ba',
+      'Tháng Tư',
+      'Tháng Năm',
+      'Tháng Sáu',
+      'Tháng Bảy',
+      'Tháng Tám',
+      'Tháng Chín',
+      'Tháng Mười',
+      'Tháng Mười Một',
+      'Tháng Chạp',
     ];
     return monthNames[month - 1];
   }
@@ -181,16 +216,18 @@ export class CalendarService {
     return this.lunarCalendarService.getYearCanChi(date);
   }
 
-
-
-
   // ==================== CONVENIENCE METHODS ====================
 
   getTodayLunar(): { day: number; month: number; year: number; leap: boolean } {
     return this.solarToLunar(this.today);
   }
 
-  getLunarDateForSolar(solarDate: Date): { day: number; month: number; year: number; leap: boolean } {
+  getLunarDateForSolar(solarDate: Date): {
+    day: number;
+    month: number;
+    year: number;
+    leap: boolean;
+  } {
     return this.solarToLunar(solarDate);
   }
 

@@ -65,9 +65,19 @@ export class ExtendedDayInfoComponent implements OnInit, OnChanges {
     this.dayQuality = this.extendedLunarService.getDayQuality(
       this.selectedDate
     );
-    this.goodHours = this.extendedLunarService.getGoodHours(this.selectedDate);
+    if (this.dayCanChi) {
+      this.goodHours = this.extendedLunarService.getGoodHoursFromCanChi(
+        this.dayCanChi
+      );
+    }
+  }
 
+  getGoodHoursCount(): number {
+    return this.goodHours.filter((hour) => hour.isGoodHour).length;
+  }
 
+  onImageError(event: any) {
+    event.target.src = 'assets/images/chi/default.webp';
   }
 
   getQualityColor(quality: string): string {
@@ -77,5 +87,4 @@ export class ExtendedDayInfoComponent implements OnInit, OnChanges {
   getQualityIcon(quality: string): string {
     return quality === 'hoàng-đạo' ? 'checkmark-circle' : 'close-circle';
   }
-
 }
