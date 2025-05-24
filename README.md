@@ -34,6 +34,9 @@
 # Cài đặt Ionic CLI
 npm install -g @ionic/cli
 
+# Cài đặt Angular CLI
+npm install -g @angular/cli
+
 # Cài đặt các dependency của dự án
 npm install
 ```
@@ -55,11 +58,19 @@ ionic build --prod
 ### Triển khai lên Vercel
 ```bash
 npm run build:vercel
+vercel deploy --prod
 ```
 
-### Build ứng dụng Android
+### Build và chạy ứng dụng Android
 ```bash
+# Thiết lập Capacitor cho Android
 npm run android:setup
+
+# Mở dự án trong Android Studio
+ionic capacitor open android
+
+# Chạy trực tiếp trên thiết bị kết nối
+ionic capacitor run android --livereload --external
 ```
 
 ## Cấu trúc dự án
@@ -101,6 +112,32 @@ Bạn có thể sử dụng script `generate-env.js` để tạo file này tự 
 ```bash
 API_KEY=your_api_key node generate-env.js
 ```
+
+## Tương thích trình duyệt
+
+Ứng dụng được tối ưu và kiểm tra trên các trình duyệt sau:
+- Google Chrome (phiên bản 90+)
+- Mozilla Firefox (phiên bản 88+)
+- Safari (phiên bản 14+)
+- Microsoft Edge (phiên bản 90+)
+- Chrome trên Android (phiên bản 90+)
+- Safari trên iOS (phiên bản 14+)
+
+## Cập nhật và lịch sử phiên bản
+
+### v1.0.0 (10/2023)
+- Phát hành phiên bản đầu tiên
+- Hỗ trợ xem lịch âm dương
+- Chức năng cơ bản và giao diện người dùng
+
+### v1.1.0 (01/2024)
+- Thêm tính năng đọc ngày tháng
+- Cải thiện hiệu suất và trải nghiệm người dùng
+
+### v1.2.0 (04/2024)
+- Hỗ trợ PWA đầy đủ
+- Thêm nhiều sự kiện lễ hội và ngày lễ truyền thống
+- Cải thiện giao diện cho người cao tuổi
 
 ## Đóng góp
 
