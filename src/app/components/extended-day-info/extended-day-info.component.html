@@ -73,7 +73,7 @@
       >
         @for (hour of goodHours; track hour.gioChi) { @if (hour.isGoodHour) {
         <div
-          class="group relative bg-gradient-to-br from-slate-800/60 to-blue-900/40 backdrop-blur-sm rounded-2xl p-5 shadow-xl border border-yellow-500/20 hover:border-yellow-400/40 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-yellow-500/10"
+          class="group relative bg-gradient-to-br from-slate-800/60 to-blue-900/40 backdrop-blur-sm rounded-2xl p-5 pb-4 shadow-xl border border-yellow-500/20 hover:border-yellow-400/40 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-yellow-500/10"
         >
           <!-- Constellation effect -->
           <div
@@ -105,13 +105,13 @@
             </div>
 
             <h4
-              class="text-xl font-bold text-yellow-300 group-hover:text-yellow-200 transition-colors duration-300 text-center"
+              class="text-xl font-bold text-yellow-300 group-hover:text-yellow-200 transition-colors duration-300 text-center mt-1"
             >
               {{ hour.gioChi }}
             </h4>
 
             <p
-              class="text-sm font-semibold text-yellow-100/90 flex items-center"
+              class="text-sm font-semibold text-yellow-100/90"
             >
               {{ hour.khungGio }}h
             </p>
