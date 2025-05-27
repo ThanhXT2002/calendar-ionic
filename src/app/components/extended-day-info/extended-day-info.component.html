@@ -109,7 +109,6 @@
                 [src]="hour.chiImage"
                 [alt]="hour.gioChi"
                 class="w-14 h-full object-contain group-hover:scale-110 transition-transform duration-500 filter brightness-110 relative z-10 rounded-full"
-                loading="lazy"
               />
             </div>
 
@@ -174,7 +173,7 @@
             <div class="text-center mb-8">
 
               <!-- Floating mystical circle with god image -->
-              <div class="relative inline-block mt-2 mb-5">
+              <div class="relative inline-block mt-2 md:mt-0 mb-5">
                 <!-- Outer rotating ring -->
                 <div class="absolute inset-0 w-32 h-32 border-2 border-dashed rounded-full animate-spin-slow scale-125 lg:scale-110"
                      [ngClass]="isAuspicious ? 'border-amber-400/50' : 'border-red-400/50'"></div>

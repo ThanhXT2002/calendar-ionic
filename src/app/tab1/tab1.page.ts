@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { IonContent } from '@ionic/angular/standalone';
 import { CalendarService } from '../core/services/calendar.service';
 import { CommonModule, DatePipe } from '@angular/common';
-import { calendarOutline, giftOutline, moonOutline, starOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Festivals } from '../core/data/festivals.data';
 import { MemorialDays } from '../core/data/memorial-days.data';
@@ -55,7 +54,7 @@ export class Tab1Page implements OnInit {
   }
 
   ngOnInit() {
-    addIcons({ giftOutline, starOutline, calendarOutline, moonOutline });
+    this.checkAndPreloadVoices();
     this.calculateUpcomingEvents();
   }
 
@@ -140,7 +139,11 @@ export class Tab1Page implements OnInit {
     }
   }
 
-  private getEventDate(day: number, month: number, isLunar: boolean): Date | null {
+  private getEventDate(
+    day: number,
+    month: number,
+    isLunar: boolean
+  ): Date | null {
     const currentYear = new Date().getFullYear();
     let eventDate: Date | null = null;
 
@@ -150,14 +153,28 @@ export class Tab1Page implements OnInit {
 
       // Nếu ngày âm lịch đã qua trong năm hiện tại, thử năm tiếp theo
       if (!eventDate || eventDate < new Date()) {
-        eventDate = this.calendarService.lunarToSolar(day, month, currentYear + 1);
+        eventDate = this.calendarService.lunarToSolar(
+          day,
+          month,
+          currentYear + 1
+        );
       }
 
       // Nếu vẫn không có, thử tháng nhuận
       if (!eventDate) {
-        eventDate = this.calendarService.lunarToSolar(day, month, currentYear, true);
+        eventDate = this.calendarService.lunarToSolar(
+          day,
+          month,
+          currentYear,
+          true
+        );
         if (!eventDate || eventDate < new Date()) {
-          eventDate = this.calendarService.lunarToSolar(day, month, currentYear + 1, true);
+          eventDate = this.calendarService.lunarToSolar(
+            day,
+            month,
+            currentYear + 1,
+            true
+          );
         }
       }
     } else {
@@ -187,6 +204,68 @@ export class Tab1Page implements OnInit {
   }
 
   // ==================== TEXT TO SPEECH METHODS ====================
+
+  private checkAndPreloadVoices(): void {
+    const today = new Date().toISOString().split('T')[0];
+    const types: SpeakType[] = ['solar', 'lunar'];
+
+    types.forEach((type) => {
+      const storageKey = `voice_${type}_${today}`;
+      const cachedVoice = localStorage.getItem(storageKey);
+      const cachedDate = localStorage.getItem(`${storageKey}_date`);
+
+      if (cachedVoice && cachedDate === today) {
+        console.log(`Đã có cache hợp lệ cho ${type}, không cần tải lại.`);
+        return;
+      }
+
+      // Xóa cache cũ một cách triệt để
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key?.startsWith(`voice_${type}_`) && !key.includes(today)) {
+          keysToRemove.push(key);
+          keysToRemove.push(`${key}_date`);
+        }
+      }
+      keysToRemove.forEach((key) => {
+        localStorage.removeItem(key);
+        console.log(`Đã xóa: ${key}`);
+      });
+
+      // Tạo text tương ứng
+      let text = '';
+      if (type === 'solar') {
+        const datePipe = new DatePipe('vi-VN');
+        const dayOfWeek = datePipe.transform(this.today, 'EEEE');
+        const dayOfMonth = datePipe.transform(this.today, 'dd');
+        const month = datePipe.transform(this.today, 'MM');
+        const year = datePipe.transform(this.today, 'yyyy');
+        text = `Lịch dương hôm nay là ${dayOfWeek}, ngày ${dayOfMonth} tháng ${month} năm ${year}`;
+      } else {
+        const lunarMonthName = this.getLunarMonthName(this.lunarDate.month);
+        const lunarYearName = this.getLunarYearName(this.lunarDate.year);
+        text = `Âm lịch hôm nay là ngày ${this.lunarDate.day} ${lunarMonthName} năm ${lunarYearName}`;
+      }
+
+      // Gọi API preload và cache
+      this.tts.speak(text).subscribe({
+        next: (res) => {
+          const audioContent = res.audioContent;
+          if (audioContent) {
+            localStorage.setItem(storageKey, audioContent);
+            localStorage.setItem(`${storageKey}_date`, today);
+            console.log(`Đã preload và cache voice ${type}`);
+          } else {
+            console.error(`Không có dữ liệu âm thanh trả về cho ${type}`);
+          }
+        },
+        error: (err) => {
+          console.error(`Lỗi khi preload TTS cho ${type}:`, err);
+        },
+      });
+    });
+  }
 
   private speakWithLocalStorage(text: string, type: SpeakType): void {
     const today = new Date().toISOString().split('T')[0];
@@ -302,6 +381,8 @@ export class Tab1Page implements OnInit {
     this.speakWithLocalStorage(formattedDate, 'lunar');
   }
 
+  // ==================== MARGIN TOP CLASS ====================
+  // Phương thức này trả về class margin-top dựa trên nền tảng
   getMarginTopClass(): string {
     if (this.isIOS) {
       return 'mt-11';
